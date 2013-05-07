@@ -241,6 +241,7 @@ public class GameManager {
 					turn = false;//stop loop
 					board.getFinalPieces(player);
 					setFinal(player);
+					player.send("ack");
 					//printFinal(player);Debug
 					if (hasWon(player)){
 						player.addWin();
