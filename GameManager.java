@@ -231,6 +231,10 @@ public class GameManager {
 					else { //player craps out
 						turn = false;//stop loop
 						board.clearTemp(player);
+						while (!split.equals("crap")){
+							player.send("err");
+							split = player.readSplitChoice();
+						}
 						player.send("ack");
 						if (p == players.size())//if active player is last in array send go to first player
 							players.get(0).send("go");
