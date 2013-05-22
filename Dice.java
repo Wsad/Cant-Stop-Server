@@ -1,0 +1,48 @@
+import java.util.Random;
+
+public class Dice {
+	int d1,d2,d3,d4;
+	int test1, test2, test3, test4; 
+	
+	public static void main (String[]args){
+		Dice d1 = new Dice ();
+		d1.roll();
+											}
+	
+	public Dice () {
+			d1 = 0;
+			d2 = 0;
+			d3 = 0;
+			d4 = 0;
+		
+															}
+	
+	public void roll (){
+		//**Create a random object to act as a dice
+	Random dice1 = new Random();	
+
+		
+		int START = 1;
+		int END = 6;
+		//** Create a range for the random numbers
+		long range = (long)END - (long)START + 1;
+		 // compute a fraction of the range, 0 <= frac < range
+	    long fraction1 = (long)(range * dice1.nextDouble());
+	    d1 =  (int)(fraction1 + START);
+	    long fraction2 = (long)(range * dice1.nextDouble());
+	    d2 =  (int)(fraction2 + START);
+	    long fraction3 = (long)(range * dice1.nextDouble());
+	    d3 =  (int)(fraction3 + START);
+	    long fraction4 = (long)(range * dice1.nextDouble());
+	    d4 =  (int)(fraction4 + START);
+	
+		
+		System.out.println(d1 + " " + d2 + " " + d3 + " " + d4 );
+						}
+	
+	
+	
+	
+	
+
+}
