@@ -5,10 +5,26 @@ public class Dice {
 	
 	public static void main (String[]args){
 		
-		Dice d1 = new Dice ();
+		Dice d1 = new Dice ();//**Multiple calls (6) to prove dice roll is random and that the split method works**//
 		d1.roll();
 		d1.split();
 		System.out.println(d1.getDice());
+		d1.roll();
+		d1.split();
+		System.out.println(d1.getDice());
+		d1.roll();
+		d1.split();
+		System.out.println(d1.getDice());
+		d1.roll();
+		d1.split();
+		System.out.println(d1.getDice());
+		d1.roll();
+		d1.split();
+		System.out.println(d1.getDice());
+		d1.roll();
+		d1.split();
+		System.out.println(d1.getDice());
+		
 											}
 	
 	public Dice () {
@@ -21,6 +37,7 @@ public class Dice {
 					}
 	
 	public void roll (){
+		
 		//**Create a random object to act as a dice
 		Random dice1 = new Random();	
 
@@ -43,6 +60,8 @@ public class Dice {
 	
 						}
 	
+	
+		//Should check for duplicates
 		public void split(){
 			
 		int split1 = d1 + d4; 
