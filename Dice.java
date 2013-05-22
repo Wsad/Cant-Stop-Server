@@ -2,11 +2,11 @@ import java.util.Random;
 
 public class Dice {
 	int d1,d2,d3,d4;
-	int test1, test2, test3, test4; 
 	
 	public static void main (String[]args){
 		Dice d1 = new Dice ();
 		d1.roll();
+		d1.split();
 											}
 	
 	public Dice () {
@@ -15,7 +15,7 @@ public class Dice {
 			d3 = 0;
 			d4 = 0;
 		
-															}
+					}
 	
 	public void roll (){
 		//**Create a random object to act as a dice
@@ -40,8 +40,19 @@ public class Dice {
 		System.out.println(d1 + " " + d2 + " " + d3 + " " + d4 );
 						}
 	
-	
-	
+		public void split(){
+			 int split1 = d1 + d4; 
+			 int halfsplit1 = d2 + d3;
+			 
+			 int split2 = d1 + d3;
+			 int halfsplit2 = d2 + d4;
+			 
+			 int split3 = d1 + d2;
+			 int halfsplit3 = d3 + d4;
+			 
+			 System.out.println("(" + split1 + "," + halfsplit1 + ")" + " (" + split2 + "," + halfsplit2 + ")" + " (" + split3 + "," + halfsplit3 + ")");
+			
+																	}
 	
 	
 
