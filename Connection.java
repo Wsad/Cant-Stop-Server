@@ -17,13 +17,6 @@ public class Connection{
 	@param s A Socket object which has been initialized and connected to client outside of this class. */
 	public Connection(Socket s){
 		socket = s;
-		reader = null;
-		writer = null;
-	}
-	
-	/**	Will initialize the reader and writer variable for the Connection object
-	NOTE: This method may not be needed since the initialization should be done in the constructor and may cause errors if attempting to read/write to client without executing this method first */
-	public void connect(){
 		try {
 			reader = new BufferedReader(new	InputStreamReader(socket.getInputStream()));
 			writer = new PrintWriter(socket.getOutputStream(), true);
