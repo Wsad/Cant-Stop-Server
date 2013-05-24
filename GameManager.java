@@ -1,7 +1,7 @@
 import java.io.*;
 import java.net.*;
 import java.util.Scanner;
-import //arraylist
+import java.util.ArrayList;
 
 public class GameManager {
 	private ArrayList<Player> players;
@@ -64,10 +64,30 @@ public class GameManager {
 				Scanner splitScan = new Scanner(split);
 				int d1 = splitScan.nextInt();
 				int d2 = splitScan.nextInt();
+				Column c1 = board.getColumn(d1);
+				Column c2 = board.getColumn(d2);
+				
+				if(!c1.getConquered){//if not conquered
+					if (c1.containsTemp(p))
+						//advance temp piece
+					else if (c1.containsFinal(p))
+						//set piece above final
+					else
+						c1.addPiece(new GamePiece(p.getPlayerNum));
+				}
+				if(!c2.getConquered){//if not conquered
+					if (c2.containsTemp(p))
+						//advance temp piece
+					else if (c2.containsFinal(p))
+						//set piece above final
+					else
+						c2.addPiece(new GamePiece(p.getPlayerNum));
+				}
+				/*
 				if (board.availableColumns().contains(board.getColumn(d1))//if column for d1 is available
 					board.getColumn(d1).addGamePiece(p.getPlayerNum());//place gamepiece for d1
 				if (board.availableColumns().contains(board.getColumn(d2))
-					board.getColumn(d2).addGamePiece(p.getPlayerNum());//place gamepiece for d2
+					board.getColumn(d2).addGamePiece(p.getPlayerNum());//place gamepiece for d2 */
 			}
 			catch {
 				System.err.println("Error reading split: " + e.getMessage());

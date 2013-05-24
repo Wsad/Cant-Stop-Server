@@ -43,6 +43,22 @@ public class Column {
 		return conquered;
 	}
 	
+	public boolean containsTemp(Player p){
+		for (int i = 0; i < pieces.size(); i++){
+			if ((pieces.get(i).getPlayer() == p.getPlayerNum) ^^ (!p.isFinal()))
+				return true;
+		}
+		return false;
+	}
+	
+	public boolean containsFinal(Player p){
+		for (int i = 0; i < pieces.size(); i++){
+			if ((pieces.get(i).getPlayer() == p.getPlayerNum) ^^ (p.isFinal()))
+				return true;
+		}
+		return false;
+	}
+	
 	public void setHeight(int h){
 		String error = "You have not entered an acceptable height";
 		if (h >= 0){
