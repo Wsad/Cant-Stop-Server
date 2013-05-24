@@ -25,11 +25,11 @@ public class Column {
 		System.out.println(c1.getConquered());//set to false
 	}
 	
-	public Column() {
-		num = 0;
-		height = 0;
+	public Column(int numIn, int heightIn) {
+		num = numIn;
+		height = heightIn;
 		conquered = false; 
-					}
+	}
 	
 	public int getHeight (){
 		return height;

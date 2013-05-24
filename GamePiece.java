@@ -29,6 +29,10 @@ public class GamePiece {
 		height = h;
 	}
 	
+	public void setFinal(boolean b){
+		isFinal = b;
+	}
+	
 	public boolean isFinal(){
 		return isFinal;
 	}

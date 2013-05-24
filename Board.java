@@ -1,17 +1,8 @@
+import java.util.ArrayList;
 
 public class Board {
 	
-	Column c2 = new Column();
-	Column c3 = new Column();
-	Column c4 = new Column();
-	Column c5 = new Column();
-	Column c6 = new Column();
-	Column c7 = new Column();
-	Column c8 = new Column();
-	Column c9 = new Column();
-	Column c10 = new Column();
-	Column c11 = new Column();
-	Column c12 = new Column();
+	Column[] columns = new Column[11];
 	
 	public static void main (String []args){
 		Board b1 = new Board ();
@@ -20,20 +11,18 @@ public class Board {
 	}
 	
 	public Board(){
-		
-		c2.setHeight(3);
-		c3.setHeight(4);
-		c4.setHeight(5);
-		c5.setHeight(6);
-		c6.setHeight(7);
-		c7.setHeight(8);
-		c8.setHeight(7);
-		c9.setHeight(6);
-		c10.setHeight(5);
-		c11.setHeight(4);
-		c12.setHeight(3);
-		
-					}
+		columns[0] = new Column(2,3);
+		columns[1] = new Column(3,5);
+		columns[2] = new Column(4,7);
+		columns[3] = new Column(5,9);
+		columns[4] = new Column(6,11);
+		columns[5] = new Column(7,13);
+		columns[6] = new Column(8,11);
+		columns[7] = new Column(9,9);
+		columns[8] = new Column(10,7);
+		columns[9] = new Column(11,5);
+		columns[10] = new Column(12,3);		
+	}
 	
 	//public boolean updateColumns(){
 		
@@ -46,7 +35,7 @@ public class Board {
 	
 	
 	
-	public int[] getList()				{
+	public int[] getList() {
 		String text = " ";
 		int [] list = new int[11];
 	
@@ -62,12 +51,21 @@ public class Board {
 		list[9] = c11.getHeight();
 		list[10] = c12.getHeight();
 	
-	for (int i = 0; i<list.length; i++){
-		text += " " + list[i];
-										}
+		for (int i = 0; i<list.length; i++){
+			text += " " + list[i];
+		}
 		System.out.println (text);
 		return list;
-											}
+	}
+	
+	public ArrayList<Column> getConqueredCols(){
+		ArrayList<Column> ret = new ArrayList<Column>();
+		for (int i =0; i < columns.length; i++){
+			if (columns[i].getConquered())
+				ret.add(columns[i]);
+		}
+		return ret;
+	}
 	
 	public String toString(){
 		String text = "Column2 : " + c2.getHeight() + "\n" + "Column3 : " + c3.getHeight() 
