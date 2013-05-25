@@ -75,6 +75,16 @@ public class Column {
 		return false;
 	}
 	
+	public GamePiece getTopPiece(){
+		GamePiece topPiece = null;
+		for (int i =0; i<pieces.size(); i++){
+			if (pieces.get(i).getHeight()== height)
+				topPiece = pieces.get(i);
+		}
+		return topPiece;
+	}
+	
+	
 	public boolean containsFinal(Player p){
 		for (int i = 0; i < pieces.size(); i++){
 			if ((pieces.get(i).getPlayer() == p.getPlayerNum()) && (pieces.get(i).isFinal()))

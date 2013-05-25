@@ -19,7 +19,6 @@ public class GameManager {
 	
 	public void connectPlayers(int numPlayers, int portIn){
 		port = portIn;
-		Player[] playerInit = new Player[numPlayers]; 
 		try {
 			serverSocket = new ServerSocket(portIn);
 		} 
@@ -29,28 +28,30 @@ public class GameManager {
 		}
 		try {
 			for (int i = 0; i < numPlayers; i++)
-				playerInit[i] = new Player(i+1, serverSocket.accept());
+				players.add(new Player(i+1, serverSocket.accept()));
 		}
 		catch (IOException e) {
 			System.err.println("Player accept failed: " + e.getMessage());
 			System.exit(-1);
 		}
 		for (int i = 0; i < numPlayers; i++)
-			playerInit[i].send(""+i + 1);
+			players.get(i).send(""+(i+1));
 	}
 	
-	public void setPieces(Player p){//FIX!!
-		if (p.readTurnChoice()){ //received "Roll" from client
+	public void setPieces(int p){//FIX!!
+		Player player = players.get(p-1);
+		player.send("go");
+		if (player.readTurnChoice()){ //received "Roll" from client
 			String roll = Dice.roll();
-			p.send(roll);//send roll info to player
-			String split = p.readSplitChoice();//read split from player
+			player.send(roll);//send roll info to player
+			String split = player.readSplitChoice();//read split from player
 			
 			while (!validSplit(split)){//if split is invalid, loop until proper split is received.
-				p.send("err");
-				split = p.readSplitChoice();
+				player.send("err");
+				split = player.readSplitChoice();
 			}
 			
-			if (canMove(p,roll)){
+			if (canMove(player,roll)){
 				//if valid split, place pieces on available columns
 				Scanner splitScan = new Scanner(split);
 				int d1 = splitScan.nextInt();
@@ -59,23 +60,29 @@ public class GameManager {
 				Column c2 = board.getColumn(d2);
 				
 				if(!c1.getConquered()){//if not conquered
-					if (c1.containsTemp(p))
-						advPiece(p.getPlayerNum(),d1);//advance temp piece
-					else if (c1.containsFinal(p))
-						setPiece(p.getPlayerNum(),d1);//set piece above final
+					if (c1.containsTemp(player))
+						advPiece(player.getPlayerNum(),d1);//advance temp piece
+					else if (c1.containsFinal(player))
+						setPiece(player.getPlayerNum(),d1);//set piece above final
 					else
-						c1.addPiece(new GamePiece(p.getPlayerNum()));
+						c1.addPiece(new GamePiece(player.getPlayerNum()));
 				}
 				if(!c2.getConquered()){//if not conquered
-					if (c2.containsTemp(p))
-						advPiece(p.getPlayerNum(),d2);//advance temp piece
-					else if (c2.containsFinal(p))
-						setPiece(p.getPlayerNum(),d2);//set piece above final
+					if (c2.containsTemp(player))
+						advPiece(player.getPlayerNum(),d2);//advance temp piece
+					else if (c2.containsFinal(player))
+						setPiece(player.getPlayerNum(),d2);//set piece above final
 					else
-						c2.addPiece(new GamePiece(p.getPlayerNum()));
+						c2.addPiece(new GamePiece(player.getPlayerNum()));
+				}
+				player.send("ack");
+				for (int i=0; i<numPlayers; i++){//send other players roll info
+					if (players.get(i) != player) 
+						players.get(i).send(roll);
 				}
 			}
 			else { //player craps out
+				board.clearTemp(player);
 			}
 		}
 	}
@@ -166,13 +173,24 @@ public class GameManager {
 		//fill here
 	}
 	
+	public void disconnect(){
+		for(int i=0;i<numPlayers;i++){
+			players.get(i).send("closing connection: ");
+			players.get(i).closeConnection();
+		}
+	}
+	
 	public static void main(String[] args){
 		GameManager gm = new GameManager();
 		gm.connectPlayers(numPlayers, Integer.parseInt(args[0]));
+		for (int i=0; i<numPlayers;i++)
+			gm.setPieces(i+1);
+		gm.disconnect();
 	}
 	
+	
 	public boolean validSplit(String in){
-		//fill here
+		return true;//fill here
 	}
 }
 	

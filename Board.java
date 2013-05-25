@@ -4,11 +4,11 @@ public class Board {
 	
 	Column[] columns = new Column[11];
 	
-	public static void main (String []args){
+	/*public static void main (String []args){
 		Board b1 = new Board ();
 		System.out.println(b1.toString());
 		b1.getList();
-	}
+	}*/
 	
 	public Board(){
 		columns[0] = new Column(2,3);
@@ -35,7 +35,7 @@ public class Board {
 	
 	
 	
-	public int[] getList() {
+	/*public int[] getList() {
 		String text = " ";
 		int [] list = new int[11];
 	
@@ -56,7 +56,7 @@ public class Board {
 		}
 		System.out.println (text);
 		return list;
-	}
+	}*/
 	
 	public ArrayList<Column> getConqueredCols(){
 		ArrayList<Column> ret = new ArrayList<Column>();
@@ -87,7 +87,23 @@ public class Board {
 		return count;
 	}
 	
-	public String toString(){
+	public ArrayList<GamePiece> getTempPieces(Player p){
+		ArrayList<GamePiece> retPieces = new ArrayList<GamePiece>();
+		for (int i=0; i<columns.length; i++){
+			retPieces.add(columns[i].getTempPiece(p.getPlayerNum()));
+		}
+		return retPieces;
+	}
+	
+	public void clearTemp(Player p){
+		for (int i=0; i<columns.length; i++){
+			GamePiece piece = columns[i].getTempPiece(p.getPlayerNum());
+			if (piece != null)
+				piece.setFinal(false);
+		}
+	}
+	
+	/*public String toString(){
 		String text = "Column2 : " + c2.getHeight() + "\n" + "Column3 : " + c3.getHeight() 
 		+ "\n" + "Column4 : " + c4.getHeight() + "\n" + "Column5 : " + c5.getHeight() 
 		+ "\n" + "Column6 : " + c6.getHeight() + "\n" + "Column7 : " + c7.getHeight() 
@@ -95,6 +111,6 @@ public class Board {
 		+ "\n" + "Column10 : " + c10.getHeight() + "\n" + "Column11 : " + c11.getHeight() 
 		+ "\n" + "Column12 : " + c12.getHeight();
 		return text;
-	}
+	}*/
 
 }
