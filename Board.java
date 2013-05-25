@@ -68,7 +68,7 @@ public class Board {
 	}
 	
 	public Column getColumn(int col){
-		if (col >= 2 && col <= 12)
+		if ((col > 1) && (col < 13))
 			return columns[col-2];
 		System.out.println("Invalid column number: getColumn method");
 		return null;

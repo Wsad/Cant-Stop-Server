@@ -51,9 +51,9 @@ public class GameManager {
 				split = player.readSplitChoice();
 			}
 			
-			if (canMove(player,roll)){
+			if (canMove(player, roll)){
 				//if valid split, place pieces on available columns
-				Scanner splitScan = new Scanner(split);
+				Scanner splitScan = new Scanner(split).useDelimiter(", ");
 				int d1 = splitScan.nextInt();
 				int d2 = splitScan.nextInt();
 				Column c1 = board.getColumn(d1);
@@ -84,6 +84,13 @@ public class GameManager {
 			else { //player craps out
 				board.clearTemp(player);
 			}
+		}else{//Player chooses to stop.
+			setFinal(player);
+			if (hasWon(player)){
+				player.addWin();
+				for (int i=0; i<numPlayers; i++)
+					players.get(i).send("P" + player.getPlayerNum()+ " has Won");
+			}
 		}
 	}
 	
@@ -106,8 +113,8 @@ public class GameManager {
 			return false;
 	}
 	
-	public boolean canMove(Player p, String roll){
-		Scanner rollScan = new Scanner(roll);
+	public boolean canMove(Player p, String rollIn){
+		Scanner rollScan = new Scanner(rollIn).useDelimiter(",\\s");
 		int d1 = rollScan.nextInt();
 		int d2 = rollScan.nextInt();
 		int d3 = rollScan.nextInt();
@@ -116,9 +123,9 @@ public class GameManager {
 		int[] cols = { d1+d2, d1+d3, d1+d4, d2+d3, d2+d4, d3+d4 };
 		int tempCounter = 0;
 		for (int i=0; i<cols.length; i++){
-			if (board.getColumn(i).getConquered())
+			if (board.getColumn(cols[i]).getConquered())
 				return false;
-			else if (board.getColumn(i).containsTemp(p)){
+			else if (board.getColumn(cols[i]).containsTemp(p)){
 				tempCounter++;
 				return true;
 			}
