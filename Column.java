@@ -1,10 +1,13 @@
 
+import java.util.ArrayList;
+
 public class Column {
 	int num, height;
 	boolean conquered;
+	ArrayList<GamePiece> pieces;
 	
 	public static void main (String []args){
-		Column c1 = new Column();
+		Column c1 = new Column(2,3);
 		c1.setHeight(1);
 		System.out.println(c1.getHeight()); //set to 1
 		c1.setHeight(-50); //error expected
@@ -29,6 +32,7 @@ public class Column {
 		num = numIn;
 		height = heightIn;
 		conquered = false; 
+		pieces = new ArrayList<GamePiece>();
 	}
 	
 	public int getHeight (){
@@ -43,9 +47,29 @@ public class Column {
 		return conquered;
 	}
 	
+	public void addPiece(GamePiece gpIn){
+		pieces.add(gpIn);
+	}
+	
+	public GamePiece getTempPiece(int player){
+		for (int i = 0; i < pieces.size(); i++){
+			if ((pieces.get(i).getPlayer() == player) && (!pieces.get(i).isFinal()))
+				return pieces.get(i);
+		}
+		return null;
+	}
+	
+	public GamePiece getFinalPiece(int player){
+		for (int i = 0; i < pieces.size(); i++){
+			if ((pieces.get(i).getPlayer() == player) && (pieces.get(i).isFinal()))
+				return pieces.get(i);
+		}
+		return null;
+	}
+	
 	public boolean containsTemp(Player p){
 		for (int i = 0; i < pieces.size(); i++){
-			if ((pieces.get(i).getPlayer() == p.getPlayerNum) ^^ (!p.isFinal()))
+			if ((pieces.get(i).getPlayer() == p.getPlayerNum()) && (!pieces.get(i).isFinal()))
 				return true;
 		}
 		return false;
@@ -53,7 +77,7 @@ public class Column {
 	
 	public boolean containsFinal(Player p){
 		for (int i = 0; i < pieces.size(); i++){
-			if ((pieces.get(i).getPlayer() == p.getPlayerNum) ^^ (p.isFinal()))
+			if ((pieces.get(i).getPlayer() == p.getPlayerNum()) && (pieces.get(i).isFinal()))
 				return true;
 		}
 		return false;
@@ -61,15 +85,15 @@ public class Column {
 	
 	public void setHeight(int h){
 		String error = "You have not entered an acceptable height";
-		if (h >= 0){
-			height = h;	}
+		if ((h >= 3) && (h <= 13))
+			height = h;	
 		else 
 			System.out.println(error);
 	}
 	
 	public void setNum(int n){
 		String msg = "You have not entered an acceptable num";
-		if (n >=0 && n <= 12){
+		if (n >=2 && n <= 12){
 			num = n; 			  }
 		else 						{
 			System.out.println(msg); }

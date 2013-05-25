@@ -20,7 +20,7 @@ public class Connection{
 		try {
 			reader = new BufferedReader(new	InputStreamReader(socket.getInputStream()));
 			writer = new PrintWriter(socket.getOutputStream(), true);
-		} catch {
+		} catch (IOException e) {
 			System.err.println("Unable to create 'reader' and 'writer' for client");
 		}
 	}
@@ -28,27 +28,29 @@ public class Connection{
 	/** This method will read the next line sent from the client. 
 	@return The method will return a String containing a line of input from the client */
 	public String read(){
-		try{
+		try {
 			return reader.readLine();
 		} catch (IOException e){
 			System.err.println("Unable to read from client: " + e.getMessage());
+			return "";
 		}
 	}
 	
 	/** This method will print the String 'out' to the output stream. This will send information from the server to the client. 
 	@param out The String which is to be sent to the client. */
 	public void print(String out){
-		try{
-			writer.println(out);
-		} catch (IOException e){
-			System.err.println("Unbable to print to client: " + e.getMessage());
-		}
+		writer.println(out);
 	}
 	
 	/** Closes the connection for the socket, reader and writer */
 	public void close(){
-		writer.close();
-		reader.close();
-		socket.close();
+		try{	
+			writer.close();
+			reader.close();
+			socket.close();
+		}
+		catch (IOException e){
+			System.err.println("Unable to close connection: " + e.getMessage());
+		}
 	}
 }

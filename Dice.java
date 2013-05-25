@@ -1,7 +1,7 @@
 import java.util.Random;
 
 public class Dice {
-	int d1,d2,d3,d4;
+	static int d1,d2,d3,d4;
 	
 	public static void main (String[]args){
 		
@@ -36,7 +36,7 @@ public class Dice {
 		
 					}
 	
-	public void roll (){
+	public static String roll(){
 		
 		//**Create a random object to act as a dice
 		Random dice1 = new Random();	
@@ -57,8 +57,10 @@ public class Dice {
 	    d3 =  (int)(fraction3 + START);
 	    long fraction4 = (long)(range * dice1.nextDouble());
 	    d4 =  (int)(fraction4 + START);
+	    
+	    return d1 +", "+d2+", "+d3+", "+d4;
 	
-						}
+		}
 	
 	
 		//Should check for duplicates
@@ -77,11 +79,10 @@ public class Dice {
 			
 							}
 		
-		public String getDice(){
+		public static String getDice(){
 			String text = " " + d1 + " " + d2 + " " + d3 + " " + d4;  
 			return text;
-				
-								}
+		}
 	
 	
 

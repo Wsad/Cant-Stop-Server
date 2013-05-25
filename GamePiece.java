@@ -10,12 +10,26 @@ public class GamePiece {
 		isFinal = false;
 	}
 	
+	public GamePiece(int playerIn, int heightIn){
+		height = heightIn;
+		player = playerIn;
+		isFinal = false;
+	}
+	
+	public void advance(){
+		height++;
+	}
+	
 	public int getHeight(){
 		return height;
 	}
 	
+	public int getPlayer(){
+		return player;
+	}
+	
 	public void setHeight(int h){
-		if (h >= 0 && h <= col.getHeight())
+		if (h >= 0 && h <= 13)//maybe add check for the column height
 		height = h;
 	}
 	

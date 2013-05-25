@@ -67,6 +67,26 @@ public class Board {
 		return ret;
 	}
 	
+	public Column getColumn(int col){
+		if (col >= 2 && col <= 12)
+			return columns[col-2];
+		System.out.println("Invalid column number: getColumn method");
+		return null;
+	}
+	
+	public Column[] getColArr(){
+		return columns;
+	}
+	
+	public int getNumPieces(Player p){
+		int count = 0;
+		for (int i=0; i<columns.length; i++){
+			if (columns[i].containsTemp(p))
+				count++;
+		}
+		return count;
+	}
+	
 	public String toString(){
 		String text = "Column2 : " + c2.getHeight() + "\n" + "Column3 : " + c3.getHeight() 
 		+ "\n" + "Column4 : " + c4.getHeight() + "\n" + "Column5 : " + c5.getHeight() 

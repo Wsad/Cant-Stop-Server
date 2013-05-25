@@ -2,7 +2,7 @@
 	A Player class to represent the a player for the Can't Stop board game
 */
 
-import java.io.*;
+//import java.io.*;
 import java.net.*;
 
 public class Player{
@@ -25,7 +25,7 @@ public class Player{
 	}
 	
 	public String readSplitChoice(){
-		connection.read();
+		return connection.read();
 	}
 	
 	public boolean readTurnChoice(){
