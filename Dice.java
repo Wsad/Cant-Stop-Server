@@ -1,7 +1,11 @@
 import java.util.Random;
+/** @author Nigel Gauvin and Alex Ringeri: Dice Class
+ * methods: roll, split and getDice */
+ 
 
 public class Dice {
-	static int d1,d2,d3,d4;
+	private int d1,d2,d3,d4;
+	private Random dice1;
 	
 	public static void main (String[]args){
 		
@@ -25,45 +29,43 @@ public class Dice {
 		d1.split();
 		System.out.println(d1.getDice());
 		
-											}
-	
+	}
+	//** Constructor: Initializes 4 dice integers
 	public Dice () {
 		
 			d1 = 0;
 			d2 = 0;
 			d3 = 0;
 			d4 = 0;
-		
-					}
-	
-	public static String roll(){
-		
-		//**Create a random object to act as a dice
-		Random dice1 = new Random();	
+			dice1 = new Random();	
 
+		
+	}
+	
+	//** Method: Roll @param: void @return String containing 4 dice integers delimited by a comma*/
+	public String roll(){
 		//Mark the range
 		int START = 1;
 		int END = 6;
 		
 		//** Create a range for the random numbers
-		long range = (long)END - (long)START + 1;
+		int range = (int)END - (int)START + 1;
 		
-		 // compute a fraction of the range, 0 <= frac < range
-	    long fraction1 = (long)(range * dice1.nextDouble());
-	    d1 =  (int)(fraction1 + START);
-	    long fraction2 = (long)(range * dice1.nextDouble());
-	    d2 =  (int)(fraction2 + START);
-	    long fraction3 = (long)(range * dice1.nextDouble());
-	    d3 =  (int)(fraction3 + START);
-	    long fraction4 = (long)(range * dice1.nextDouble());
-	    d4 =  (int)(fraction4 + START);
+	    int fraction1 = (int)(range * dice1.nextDouble());
+	    d1 =  (fraction1 + START);
+	    int fraction2 = (int)(range * dice1.nextDouble());
+	    d2 =  (fraction2 + START);
+	    int fraction3 = (int)(range * dice1.nextDouble());
+	    d3 =  (fraction3 + START);
+	    int fraction4 = (int)(range * dice1.nextDouble());
+	    d4 =  (fraction4 + START);
 	    
-	    return d1 +", "+d2+", "+d3+", "+d4;
-	
+	    String text = " " + d1 + "," + d2 + "," + d3 + "," + d4;  
+	    return text;
 		}
 	
 	
-		//Should check for duplicates
+		//**Method: Split Adds all the possibilities for a dice to be split @param: void @return: void*/
 		public void split(){
 			
 		int split1 = d1 + d4; 
@@ -74,12 +76,16 @@ public class Dice {
 			 
 		int split3 = d1 + d2;
 		int halfsplit3 = d3 + d4;
-			 
-		System.out.println("(" + split1 + "," + halfsplit1 + ")" + " (" + split2 + "," + halfsplit2 + ")" + " (" + split3 + "," + halfsplit3 + ")");
-			
-							}
 		
-		public static String getDice(){
+			 
+		System.out.println("(" + split1 + "," + halfsplit1 + ")" 
+		+ " (" + split2 + "," + halfsplit2 + ")" 
+		+ " (" + split3 + "," + halfsplit3 + ")");
+		
+		}
+		
+		//** Method getDice @param: Void @return: String containing dice integers 
+		public String getDice(){
 			String text = " " + d1 + " " + d2 + " " + d3 + " " + d4;  
 			return text;
 		}
