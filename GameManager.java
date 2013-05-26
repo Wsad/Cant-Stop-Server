@@ -38,60 +38,69 @@ public class GameManager {
 			players.get(i).send(""+(i+1));
 	}
 	
-	public void setPieces(int p){//FIX!!
+	public void turn(int p){
+		System.out.println("42");
+		boolean turn = true;
 		Player player = players.get(p-1);
 		player.send("go");
-		if (player.readTurnChoice()){ //received "Roll" from client
-			String roll = Dice.roll();
-			player.send(roll);//send roll info to player
-			String split = player.readSplitChoice();//read split from player
-			
-			while (!validSplit(split)){//if split is invalid, loop until proper split is received.
-				player.send("err");
-				split = player.readSplitChoice();
-			}
-			
-			if (canMove(player, roll)){
-				//if valid split, place pieces on available columns
-				Scanner splitScan = new Scanner(split).useDelimiter(", ");
-				int d1 = splitScan.nextInt();
-				int d2 = splitScan.nextInt();
-				Column c1 = board.getColumn(d1);
-				Column c2 = board.getColumn(d2);
+		while (turn){
+			if (player.readTurnChoice()){ //received "Roll" from client
+				String roll = Dice.roll();
+				player.send(roll);//send roll info to player
+				String split = player.readSplitChoice();//read split from player
 				
-				if(!c1.getConquered()){//if not conquered
-					if (c1.containsTemp(player))
-						advPiece(player.getPlayerNum(),d1);//advance temp piece
-					else if (c1.containsFinal(player))
-						setPiece(player.getPlayerNum(),d1);//set piece above final
-					else
-						c1.addPiece(new GamePiece(player.getPlayerNum()));
+				while (!validSplit(split)){//if split is invalid, loop until proper split is received.
+					player.send("err");
+					split = player.readSplitChoice();
 				}
-				if(!c2.getConquered()){//if not conquered
-					if (c2.containsTemp(player))
-						advPiece(player.getPlayerNum(),d2);//advance temp piece
-					else if (c2.containsFinal(player))
-						setPiece(player.getPlayerNum(),d2);//set piece above final
-					else
-						c2.addPiece(new GamePiece(player.getPlayerNum()));
+				
+				if (canMove(player, roll)){
+					//if valid split and the player can move: place pieces on available columns
+					Scanner splitScan = new Scanner(split).useDelimiter(",");
+					int d1 = splitScan.nextInt();
+					int d2 = splitScan.nextInt();
+					Column c1 = board.getColumn(d1);
+					Column c2 = board.getColumn(d2);
+					
+					if(!c1.getConquered()){//if not conquered
+						if (c1.containsTemp(player))
+							advPiece(player.getPlayerNum(),d1);//advance temp piece
+						else if (c1.containsFinal(player))
+							setPiece(player.getPlayerNum(),d1);//set piece above final
+						else
+							c1.addPiece(new GamePiece(player.getPlayerNum()));
+					}
+					if(!c2.getConquered()){//if not conquered
+						if (c2.containsTemp(player))
+							advPiece(player.getPlayerNum(),d2);//advance temp piece
+						else if (c2.containsFinal(player))
+							setPiece(player.getPlayerNum(),d2);//set piece above final
+						else
+							c2.addPiece(new GamePiece(player.getPlayerNum()));
+					}
+					player.send("ack");
+					for (int i=0; i<numPlayers; i++){//send other players roll info
+						if (players.get(i) != player) 
+							players.get(i).send(roll);
+					}
+					System.out.println("84");
+					turn = true; //loop again
 				}
-				player.send("ack");
-				for (int i=0; i<numPlayers; i++){//send other players roll info
-					if (players.get(i) != player) 
-						players.get(i).send(roll);
+				else { //player craps out
+					turn = false;//stop loop
+					board.clearTemp(player);
+				}
+			}else{//Player chooses to stop.
+				System.out.println("93");
+				turn = false;//stop loop
+				setFinal(player);
+				if (hasWon(player)){
+					player.addWin();
+					for (int i=0; i<numPlayers; i++)
+						players.get(i).send("P" + player.getPlayerNum()+ " has Won");
 				}
 			}
-			else { //player craps out
-				board.clearTemp(player);
-			}
-		}else{//Player chooses to stop.
-			setFinal(player);
-			if (hasWon(player)){
-				player.addWin();
-				for (int i=0; i<numPlayers; i++)
-					players.get(i).send("P" + player.getPlayerNum()+ " has Won");
-			}
-		}
+		}		
 	}
 	
 	public void setFinal(Player p){
@@ -114,7 +123,7 @@ public class GameManager {
 	}
 	
 	public boolean canMove(Player p, String rollIn){
-		Scanner rollScan = new Scanner(rollIn).useDelimiter(",\\s");
+		Scanner rollScan = new Scanner(rollIn).useDelimiter(",");
 		int d1 = rollScan.nextInt();
 		int d2 = rollScan.nextInt();
 		int d3 = rollScan.nextInt();
@@ -176,10 +185,6 @@ public class GameManager {
 			return false;
 	}
 	
-	public void turn(Player p){
-		//fill here
-	}
-	
 	public void disconnect(){
 		for(int i=0;i<numPlayers;i++){
 			players.get(i).send("closing connection: ");
@@ -190,8 +195,8 @@ public class GameManager {
 	public static void main(String[] args){
 		GameManager gm = new GameManager();
 		gm.connectPlayers(numPlayers, Integer.parseInt(args[0]));
-		for (int i=0; i<numPlayers;i++)
-			gm.setPieces(i+1);
+		for (int i=1; i<=numPlayers;i++)
+			gm.turn(i);
 		gm.disconnect();
 	}
 	

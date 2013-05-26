@@ -34,7 +34,7 @@ public class TestClient {
 
 	         boolean done = false;
 	         while (!done) {
-	        	System.out.println(serverIn.readLine());
+				System.out.println(serverLine);
 	            String line = userIn.readLine();
 	            if (line.equals("BYE")) { done = true; }
 	            else if (!line.equals("none"))
