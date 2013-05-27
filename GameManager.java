@@ -40,22 +40,16 @@ public class GameManager {
 	}
 	
 	public void turn(int p){
-		System.out.println("Start of turn");
 		boolean turn = true;
 		Player player = players.get(p-1);
-		//player.send("go");
 		while (turn){
 			String turnchoice = player.getConnection().read();
-			System.out.println("turn choice: " + turnchoice);
 			if (turnchoice.equals("roll")){ //received "Roll" from client
 				String roll = Dice.roll();
-				System.out.println(roll);
 				String diceSplit = Dice.split();
-				System.out.println(diceSplit);
 				for (int i=0; i<players.size(); i++)
 					players.get(i).send(roll);//Send roll information to each player.
 				String split = player.readSplitChoice();//read split from player
-				System.out.println("Player split :"+split);
 				while (!validSplit(diceSplit, split)){//if split is invalid, loop until proper split is received.
 					player.send("err");
 					split = player.readSplitChoice();
@@ -74,15 +68,12 @@ public class GameManager {
 					if(!c1.getConquered()){//if not conquered
 						if (c1.containsTemp(player)){
 							advPiece(player.getPlayerNum(),d1);
-							System.out.println("advpiece");
 						}//advance temp piece
 						else if (numTemp < 3){
 							if (c1.containsFinal(player)){
-								setPiece(player.getPlayerNum(),d1);
-								System.out.println("above final");//set piece above final
+								setPiece(player.getPlayerNum(),d1);//set piece above final
 							}else{
 								c1.addPiece(new GamePiece(player.getPlayerNum()));
-								System.out.println("add piece");
 							}
 							numTemp++;
 						}
@@ -103,7 +94,6 @@ public class GameManager {
 						if (players.get(i) != player) 
 							players.get(i).send(split);
 					}
-					System.out.println("Valid split");
 					turn = true; //loop again
 				}
 				else { //player craps out
@@ -116,7 +106,6 @@ public class GameManager {
 						players.get(p).send("go");
 				}
 			}else{//Player chooses to stop.
-				System.out.println("stop");
 				turn = false;//stop loop
 				board.getFinalPieces(player);
 				setFinal(player);

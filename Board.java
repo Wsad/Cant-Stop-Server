@@ -49,33 +49,23 @@ public class Board {
 	
 	public ArrayList<GamePiece> getFinalPieces(Player p){
 		ArrayList<GamePiece> retPieces = new ArrayList<GamePiece>();
-		System.out.println("Final pieces arr: \n");//debug
 		for (int i=0; i<columns.length; i++){
 			GamePiece temp = columns[i].getFinalPiece(p.getPlayerNum());
 			if (temp != null){
 				retPieces.add(temp);
-				System.out.println("col"+(i+2));
 			}
 		}
-		
-		for (int i=0; i<retPieces.size();i++)
-			System.out.println(i+ " Height" + retPieces.get(i).getHeight());
 		return retPieces;
 	}
 		
 	public ArrayList<GamePiece> getTempPieces(Player p){
 		ArrayList<GamePiece> retPieces = new ArrayList<GamePiece>();
-		System.out.println("Temp pieces arr: \n");//debug
 		for (int i=0; i<columns.length; i++){
 			GamePiece temp = columns[i].getTempPiece(p.getPlayerNum());
 			if (temp != null){
 				retPieces.add(temp);
-				System.out.println("col"+(i+2));
 			}
 		}
-		
-		for (int i=0; i<retPieces.size();i++)
-			System.out.println(i+ " Height" + retPieces.get(i).getHeight());
 		return retPieces;
 	}
 	
