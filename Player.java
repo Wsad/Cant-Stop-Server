@@ -56,9 +56,9 @@ public class Player{
 	 * @return True if received "roll" and False is received "stop"
 	 */
 	public boolean readTurnChoice(){
-		if (connection.read().equals("Roll"))
+		if (connection.read().equals("roll"))
 			return true;
-		else if (connection.read().equals("Stop"))
+		else if (connection.read().equals("stop"))
 			return false;
 		else {
 			System.out.println("Improper input from client for turn choice");

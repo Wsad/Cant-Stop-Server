@@ -3,13 +3,7 @@ import java.util.ArrayList;
 public class Board {
 	
 	Column[] columns = new Column[11];
-	
-	/*public static void main (String []args){
-		Board b1 = new Board ();
-		System.out.println(b1.toString());
-		b1.getList();
-	}*/
-	
+
 	public Board(){
 		columns[0] = new Column(2,3);
 		columns[1] = new Column(3,5);
@@ -23,40 +17,6 @@ public class Board {
 		columns[9] = new Column(11,5);
 		columns[10] = new Column(12,3);		
 	}
-	
-	//public boolean updateColumns(){
-		
-	//	boolean [] col = this.getList(); 
-	//	for (int i =0; i< col.length; i++) {
-			//if (i == )
-			
-	//										}
-	//								}
-	
-	
-	
-	/*public int[] getList() {
-		String text = " ";
-		int [] list = new int[11];
-	
-		list[0] = c2.getHeight();
-		list[1] = c3.getHeight();
-		list[2] = c4.getHeight();
-		list[3] = c5.getHeight();
-		list[4] = c6.getHeight();
-		list[5] = c7.getHeight();
-		list[6] = c8.getHeight();
-		list[7] = c9.getHeight();
-		list[8] = c10.getHeight();
-		list[9] = c11.getHeight();
-		list[10] = c12.getHeight();
-	
-		for (int i = 0; i<list.length; i++){
-			text += " " + list[i];
-		}
-		System.out.println (text);
-		return list;
-	}*/
 	
 	public ArrayList<Column> getConqueredCols(){
 		ArrayList<Column> ret = new ArrayList<Column>();
@@ -87,11 +47,35 @@ public class Board {
 		return count;
 	}
 	
+	public ArrayList<GamePiece> getFinalPieces(Player p){
+		ArrayList<GamePiece> retPieces = new ArrayList<GamePiece>();
+		System.out.println("Final pieces arr: \n");//debug
+		for (int i=0; i<columns.length; i++){
+			GamePiece temp = columns[i].getFinalPiece(p.getPlayerNum());
+			if (temp != null){
+				retPieces.add(temp);
+				System.out.println("col"+(i+2));
+			}
+		}
+		
+		for (int i=0; i<retPieces.size();i++)
+			System.out.println(i+ " Height" + retPieces.get(i).getHeight());
+		return retPieces;
+	}
+		
 	public ArrayList<GamePiece> getTempPieces(Player p){
 		ArrayList<GamePiece> retPieces = new ArrayList<GamePiece>();
+		System.out.println("Temp pieces arr: \n");//debug
 		for (int i=0; i<columns.length; i++){
-			retPieces.add(columns[i].getTempPiece(p.getPlayerNum()));
+			GamePiece temp = columns[i].getTempPiece(p.getPlayerNum());
+			if (temp != null){
+				retPieces.add(temp);
+				System.out.println("col"+(i+2));
+			}
 		}
+		
+		for (int i=0; i<retPieces.size();i++)
+			System.out.println(i+ " Height" + retPieces.get(i).getHeight());
 		return retPieces;
 	}
 	
@@ -102,15 +86,4 @@ public class Board {
 				piece.setFinal(false);
 		}
 	}
-	
-	/*public String toString(){
-		String text = "Column2 : " + c2.getHeight() + "\n" + "Column3 : " + c3.getHeight() 
-		+ "\n" + "Column4 : " + c4.getHeight() + "\n" + "Column5 : " + c5.getHeight() 
-		+ "\n" + "Column6 : " + c6.getHeight() + "\n" + "Column7 : " + c7.getHeight() 
-		+ "\n" + "Column8 : " + c8.getHeight() + "\n" +"Column9 : " + c9.getHeight() 
-		+ "\n" + "Column10 : " + c10.getHeight() + "\n" + "Column11 : " + c11.getHeight() 
-		+ "\n" + "Column12 : " + c12.getHeight();
-		return text;
-	}*/
-
 }

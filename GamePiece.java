@@ -15,7 +15,7 @@ public class GamePiece {
 	 * @param playerIn The player number to be assigned for the game piece.
 	 */
 	public GamePiece(int playerIn){
-		height = 0;
+		height = 1;
 		player = playerIn;
 		isFinal = false;
 	}

@@ -6,15 +6,16 @@ import java.util.ArrayList;
 public class GameManager {
 	private ArrayList<Player> players;
 	private Board board;
-	private int turn, port;
+	private static boolean run;
+	private int port;
 	private static int numPlayers = 2;
 	private ServerSocket serverSocket;
 	
 	public GameManager(){
 		players = new ArrayList<Player>();
 		board = new Board();
-		turn = 0;
 		serverSocket = null;
+		run = true;
 	}
 	
 	public void connectPlayers(int numPlayers, int portIn){
@@ -39,22 +40,30 @@ public class GameManager {
 	}
 	
 	public void turn(int p){
-		System.out.println("42");
+		System.out.println("Start of turn");
 		boolean turn = true;
 		Player player = players.get(p-1);
-		player.send("go");
+		//player.send("go");
 		while (turn){
-			if (player.readTurnChoice()){ //received "Roll" from client
+			String turnchoice = player.getConnection().read();
+			System.out.println("turn choice: " + turnchoice);
+			if (turnchoice.equals("roll")){ //received "Roll" from client
 				String roll = Dice.roll();
-				player.send(roll);//send roll info to player
+				System.out.println(roll);
+				String diceSplit = Dice.split();
+				System.out.println(diceSplit);
+				for (int i=0; i<players.size(); i++)
+					players.get(i).send(roll);//Send roll information to each player.
 				String split = player.readSplitChoice();//read split from player
-				
-				while (!validSplit(split)){//if split is invalid, loop until proper split is received.
+				System.out.println("Player split :"+split);
+				while (!validSplit(diceSplit, split)){//if split is invalid, loop until proper split is received.
 					player.send("err");
 					split = player.readSplitChoice();
 				}
 				
-				if (canMove(player, roll)){
+				int numTemp = board.getNumPieces(player);
+				
+				if (canMove(player, roll, numTemp)){
 					//if valid split and the player can move: place pieces on available columns
 					Scanner splitScan = new Scanner(split).useDelimiter(",");
 					int d1 = splitScan.nextInt();
@@ -63,44 +72,88 @@ public class GameManager {
 					Column c2 = board.getColumn(d2);
 					
 					if(!c1.getConquered()){//if not conquered
-						if (c1.containsTemp(player))
-							advPiece(player.getPlayerNum(),d1);//advance temp piece
-						else if (c1.containsFinal(player))
-							setPiece(player.getPlayerNum(),d1);//set piece above final
-						else
-							c1.addPiece(new GamePiece(player.getPlayerNum()));
+						if (c1.containsTemp(player)){
+							advPiece(player.getPlayerNum(),d1);
+							System.out.println("advpiece");
+						}//advance temp piece
+						else if (numTemp < 3){
+							if (c1.containsFinal(player)){
+								setPiece(player.getPlayerNum(),d1);
+								System.out.println("above final");//set piece above final
+							}else{
+								c1.addPiece(new GamePiece(player.getPlayerNum()));
+								System.out.println("add piece");
+							}
+							numTemp++;
+						}
 					}
 					if(!c2.getConquered()){//if not conquered
 						if (c2.containsTemp(player))
 							advPiece(player.getPlayerNum(),d2);//advance temp piece
-						else if (c2.containsFinal(player))
-							setPiece(player.getPlayerNum(),d2);//set piece above final
-						else
-							c2.addPiece(new GamePiece(player.getPlayerNum()));
+						else if (numTemp < 3){
+							if (c2.containsFinal(player))
+								setPiece(player.getPlayerNum(),d2);//set piece above final
+							else
+								c2.addPiece(new GamePiece(player.getPlayerNum()));
+							numTemp++;
+						}
 					}
 					player.send("ack");
 					for (int i=0; i<numPlayers; i++){//send other players roll info
 						if (players.get(i) != player) 
-							players.get(i).send(roll);
+							players.get(i).send(split);
 					}
-					System.out.println("84");
+					System.out.println("Valid split");
 					turn = true; //loop again
 				}
 				else { //player craps out
 					turn = false;//stop loop
 					board.clearTemp(player);
+					player.send("ack");
+					if (p == players.size())//if active player is last in array send go to first player
+						players.get(0).send("go");
+					else					//else send to next player (is p since list is from 0 to numPlayers - 1.
+						players.get(p).send("go");
 				}
 			}else{//Player chooses to stop.
-				System.out.println("93");
+				System.out.println("stop");
 				turn = false;//stop loop
+				board.getFinalPieces(player);
 				setFinal(player);
 				if (hasWon(player)){
 					player.addWin();
 					for (int i=0; i<numPlayers; i++)
 						players.get(i).send("P" + player.getPlayerNum()+ " has Won");
+					/**if (playAgain()){ 		Play again.
+						board = new Board();
+						run = true;
+						players.get(0).send("go");
+					}
+					else*/
+						run = false;
 				}
+				else if (p == players.size())//if active player is last in array send go to first player
+					players.get(0).send("go");
+				else					//else send to next player (is p since list is from 0 to numPlayers - 1.
+					players.get(p).send("go");
 			}
 		}		
+	}
+	
+	public boolean playAgain(){
+		for (int i =0;i< players.size();i++)
+			players.get(i).send("Play Again? Y/N");
+		ArrayList<Player> newPlayers = new ArrayList<Player>();
+		boolean ret = false;
+		for (int i =0;i< players.size();i++){
+			if (players.get(i).getConnection().read().equals("Y"))
+				newPlayers.add(players.get(i));
+				if (i>1)
+					ret = true;
+		}
+		players = newPlayers;
+		return ret;
+			
 	}
 	
 	public void setFinal(Player p){
@@ -110,19 +163,28 @@ public class GameManager {
 	}
 	
 	public boolean hasWon(Player p){
-		ArrayList<Column> conqueredList = board.getConqueredCols();
+		Column [] col = board.getColArr();
 		int conquered = 0;
-		for (int i =0; i < conqueredList.size() ; i++){
-			if(conqueredList.get(i).getTopPiece().getPlayer() == p.getPlayerNum())
+		for (int i=0;i<col.length;i++){
+			GamePiece finalPiece = col[i].getFinalPiece(p.getPlayerNum());
+			if ((finalPiece) != null && (finalPiece.getHeight() == col[i].getHeight()))
 				conquered++;
 		}
+		/*System.out.println("Has Won Method");
+		ArrayList<Column> conqueredList = board.getConqueredCols();
+		
+		for (int i =0; i < conqueredList.size() ; i++){
+			System.out.println("\nConquered Column " + i+"\n # " +conqueredList.get(i).getNum());
+			if(conqueredList.get(i).getTopPiece().getPlayer() == p.getPlayerNum())
+				conquered++;
+		}*/
 		if (conquered >= 3)
 			return true;
 		else
 			return false;
 	}
 	
-	public boolean canMove(Player p, String rollIn){
+	public boolean canMove(Player p, String rollIn, int numberTempPieces){
 		Scanner rollScan = new Scanner(rollIn).useDelimiter(",");
 		int d1 = rollScan.nextInt();
 		int d2 = rollScan.nextInt();
@@ -130,22 +192,23 @@ public class GameManager {
 		int d4 = rollScan.nextInt();
 		
 		int[] cols = { d1+d2, d1+d3, d1+d4, d2+d3, d2+d4, d3+d4 };
-		int tempCounter = 0;
+		int moveCounter =0;//number of possible moves for the player.
 		for (int i=0; i<cols.length; i++){
-			if (board.getColumn(cols[i]).getConquered())
-				return false;
-			else if (board.getColumn(cols[i]).containsTemp(p)){
-				tempCounter++;
+			if (!board.getColumn(cols[i]).getConquered())//if column is not conquered then increase move counter.
+				moveCounter++;
+			if (board.getColumn(cols[i]).containsTemp(p)){
 				return true;
 			}
 		}
-		if (board.getNumPieces(p) < 3)
+		if (moveCounter == 0)
+			return false;
+		if (numberTempPieces < 3)
 			return true;
 		else
 			return false;
-		//for each possible move: 	check whether col is conquered -> return false
+		//for each possible move: 	check whether all columns are conquered -> return false
 		//							Check whether player has temp piece ->return true (count piece)
-		//							If there are no temp pieces, count total number of temp pieces.
+		//							count total number of temp pieces.
 		//								if number of temp pieces is less than 3 -> return true
 		//								else return false (crapped out)
 	}
@@ -195,14 +258,16 @@ public class GameManager {
 	public static void main(String[] args){
 		GameManager gm = new GameManager();
 		gm.connectPlayers(numPlayers, Integer.parseInt(args[0]));
-		for (int i=1; i<=numPlayers;i++)
-			gm.turn(i);
+		while (run){
+			for (int i=1; i<=numPlayers;i++)
+				gm.turn(i);
+		}
 		gm.disconnect();
 	}
 	
 	
-	public boolean validSplit(String in){
-		return true;//fill here
+	public boolean validSplit(String diceSplitIn, String splitIn){
+		return diceSplitIn.contains(splitIn);
 	}
 }
 	
