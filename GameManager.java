@@ -18,6 +18,16 @@ public class GameManager {
 		run = true;
 	}
 	
+	public static void main(String[] args){
+		GameManager gm = new GameManager();
+		gm.connectPlayers(numPlayers, Integer.parseInt(args[0]));
+		while (run){
+			for (int i=1; i<=numPlayers;i++)
+				gm.turn(i);
+		}
+		gm.disconnect();
+	}
+	
 	public void connectPlayers(int numPlayers, int portIn){
 		port = portIn;
 		try {
@@ -109,11 +119,12 @@ public class GameManager {
 				turn = false;//stop loop
 				board.getFinalPieces(player);
 				setFinal(player);
+				//printFinal(player);Debug
 				if (hasWon(player)){
 					player.addWin();
 					for (int i=0; i<numPlayers; i++)
 						players.get(i).send("P" + player.getPlayerNum()+ " has Won");
-					/**if (playAgain()){ 		Play again.
+					/*if (playAgain()){ 	
 						board = new Board();
 						run = true;
 						players.get(0).send("go");
@@ -129,18 +140,36 @@ public class GameManager {
 		}		
 	}
 	
+	public void printFinal(Player p){
+		Column[] col = board.getColArr();
+		for (int i=0;i<col.length;i++){
+			if (col[i].getFinalPiece(p.getPlayerNum()) != null){
+				System.out.print("Column "+(i+2)+" :"+col[i].getFinalPiece(p.getPlayerNum()).getHeight());
+				if (col[i].getConquered())
+					System.out.println(" Conquered : Y");
+				else 
+					System.out.println(" Conquered : N");
+			}
+		}
+	}
+	
 	public boolean playAgain(){
 		for (int i =0;i< players.size();i++)
 			players.get(i).send("Play Again? Y/N");
 		ArrayList<Player> newPlayers = new ArrayList<Player>();
+		int newNumPlayers =0 ;
 		boolean ret = false;
 		for (int i =0;i< players.size();i++){
-			if (players.get(i).getConnection().read().equals("Y"))
+			if (players.get(i).getConnection().read().equals("Y")){
 				newPlayers.add(players.get(i));
-				if (i>1)
-					ret = true;
+				newNumPlayers++;
+			}
 		}
-		players = newPlayers;
+		if (newNumPlayers >1){
+			ret = true;
+			players = newPlayers;
+			numPlayers = newNumPlayers;
+		}
 		return ret;
 			
 	}
@@ -233,8 +262,7 @@ public class GameManager {
 			gamePiece.advance();
 			return true;
 		}
-		else
-			return false;
+		return false;
 	}
 	
 	public void disconnect(){
@@ -242,16 +270,6 @@ public class GameManager {
 			players.get(i).send("closing connection: ");
 			players.get(i).closeConnection();
 		}
-	}
-	
-	public static void main(String[] args){
-		GameManager gm = new GameManager();
-		gm.connectPlayers(numPlayers, Integer.parseInt(args[0]));
-		while (run){
-			for (int i=1; i<=numPlayers;i++)
-				gm.turn(i);
-		}
-		gm.disconnect();
 	}
 	
 	
