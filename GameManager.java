@@ -8,7 +8,7 @@ public class GameManager {
 	private Board board;
 	private boolean run;
 	private int port;
-	private static final int NUM_PLAYERS = 2;
+	private static final int NUM_PLAYERS = 1;//2;
 	private ServerSocket serverSocket;
 	private final FileIO USERS;
 	private final String USERS_FILENAME = "users.txt";
@@ -69,40 +69,47 @@ public class GameManager {
 		}
 		for (int i = 0; i < NUM_PLAYERS; i++){
 			Player player = players.get(i);
-			//read username string from client
-			//if first char is 'N'
-				//if username exists
-					//send error "err,Duplicate User Name"
-				//else
+			String userMessage = player.getConnection().read();//read username string from client
+			String username = userMessage.substring(2);
+			if (userMessage.charAt(0)== 'N'){//if first char is 'N'
+				if (userExists(username)){//if username exists
+					player.send("err,Duplicate User Name");//send error "err,Duplicate User Name"
+				}else{
 					//store username
-					//send "ack"
-					//read password string from client
+					player.send("ack");//send "ack"
+					String password = player.getConnection().read();//read password string from client
 					//store password
-					//send "ack"
-			//else if first char is 'R'
-				//if username exists
-					//send "ack"
-					//read password string from client
-					//if password matches
-						//send ack
-					//else
-						//send "err,Invalid Password"
-				//else
-					//send error "err,Unknown User"
+					USERS.println(username +";"+password+";"+"0,0,0;");//write "username;password;0,0,0;" to users.txt
+					player.send("ack");//send "ack"
+				}
+			}else if (userMessage.charAt(0)== 'R'){//if first char is 'R'
+				if (userExists(username)){//if username exists
+					player.send("ack");//send "ack"
+					String password = player.getConnection().read();//read password string from client
+					if (userExists(username+";"+password))//if password matches
+						player.send("ack");//send ack
+					else
+						player.send("err,Invalid Password");//send "err,Invalid Password"
+				}else
+					player.send("err,Unknown User");//send error "err,Unknown User"
 			player.send(""+(i+1));
+			USERS.close();//debug
+			}
 		}
 	}
 	
 	public boolean userExists(String usernameIn){
-		while (USERS.hasNext()){
-			String line = USERS.readLine();
+		String line = USERS.readLine();
+		while (line != ""){
 			int length = usernameIn.length();
-			if (line.substring(0, length).equals(usernameIn)){
+			if ((line.length() >= length) && (line.substring(0, length).equals(usernameIn))){
 				USERS.resetReader();
 				return true;
 			}else
 				line = USERS.readLine();
+				System.out.println(line);
 		}
+		USERS.resetReader();
 		return false;
 	}
 	
