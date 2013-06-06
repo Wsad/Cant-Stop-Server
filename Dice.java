@@ -7,15 +7,6 @@ public class Dice {
 	private static int d1,d2,d3,d4;
 	private static Random dice1=new Random();
 	
-	//** Constructor: Initializes 4 dice integers
-	public Dice () {
-		
-			d1 = 0;
-			d2 = 0;
-			d3 = 0;
-			d4 = 0;		
-	}
-	
 	//** Method: Roll @param: void @return String containing 4 dice integers delimited by a comma*/
 	public static String roll(){
 		d1 = dice1.nextInt(6)+1;

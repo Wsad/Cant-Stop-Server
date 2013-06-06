@@ -8,7 +8,7 @@ public class GameManager {
 	private Board board;
 	private boolean run;
 	private int port;
-	private static final int NUM_PLAYERS = 1;//2;
+	private static final int NUM_PLAYERS = 2;//2;
 	private ServerSocket serverSocket;
 	private final FileIO USERS;
 	private final String USERS_FILENAME = "users.txt";
@@ -23,21 +23,26 @@ public class GameManager {
 	
 	public static void main(String[] args){
 		GameManager gm = new GameManager();
-		gm.connectPlayers(NUM_PLAYERS, Integer.parseInt(args[0])); //JOSH: What happens if you can't parse the port?
+		//gm.connectPlayers(NUM_PLAYERS, Integer.parseInt(args[0])); //JOSH: What happens if you can't parse the port?
 		
 		//potential fix...
 		/*boolean havePort = false;
+		int portIn;
 		while (!havePort){
 			try {
-				gm.connectPlayers(NUM_PLAYERS, Integer.parseInt(args[0]));
+				portIn = Integer.parseInt(args[0]);
+				gm.connectPlayers(NUM_PLAYERS, portIn);
 				havePort = true;
 			}
 			catch (ArrayIndexOutOfBoundsException e){
 				System.out.print("Port not found. Enter port number and press enter: ");
 				Scanner sc = new Scanner(System.in);
-				gm.connectPlayers(NUM_PLAYERS, sc.nextInt());
+				portIn = sc.nextInt();
+				sc.nextInt();
+				havePort = true;
 			}
 		}*/
+		
 		
 		while (gm.run()){
 			for (int i=1; i<=NUM_PLAYERS;i++)
@@ -52,6 +57,7 @@ public class GameManager {
 	
 	public void connectPlayers(int NUM_PLAYERS, int portIn){
 		port = portIn;
+		System.out.println(portIn);
 		try {
 			serverSocket = new ServerSocket(portIn);
 		} 
@@ -93,9 +99,9 @@ public class GameManager {
 				}else
 					player.send("err,Unknown User");//send error "err,Unknown User"
 			player.send(""+(i+1));
-			USERS.close();//debug
 			}
 		}
+		USERS.close();//debug
 	}
 	
 	public boolean userExists(String usernameIn){
@@ -336,9 +342,12 @@ public class GameManager {
 		}
 	}
 	
+	public void setPort(int portIn){
+		port = portIn;
+	}
 	
 	public boolean validSplit(String diceSplitIn, String splitIn){
-		return diceSplitIn.contains(splitIn);
+		return ((diceSplitIn.contains(splitIn))||(splitIn.contains("crap")));
 	}
 }
 	
