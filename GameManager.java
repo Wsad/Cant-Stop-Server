@@ -6,29 +6,51 @@ import java.util.ArrayList;
 public class GameManager {
 	private ArrayList<Player> players;
 	private Board board;
-	private static boolean run;
+	private boolean run;
 	private int port;
-	private static int numPlayers = 2;
+	private static final int NUM_PLAYERS = 2;
 	private ServerSocket serverSocket;
+	private final FileIO USERS;
+	private final String USERS_FILENAME = "users.txt";
 	
 	public GameManager(){
 		players = new ArrayList<Player>();
 		board = new Board();
 		serverSocket = null;
+		USERS = new FileIO(USERS_FILENAME);
 		run = true;
 	}
 	
 	public static void main(String[] args){
 		GameManager gm = new GameManager();
-		gm.connectPlayers(numPlayers, Integer.parseInt(args[0]));
-		while (run){
-			for (int i=1; i<=numPlayers;i++)
+		gm.connectPlayers(NUM_PLAYERS, Integer.parseInt(args[0])); //JOSH: What happens if you can't parse the port?
+		
+		//potential fix...
+		/*boolean havePort = false;
+		while (!havePort){
+			try {
+				gm.connectPlayers(NUM_PLAYERS, Integer.parseInt(args[0]));
+				havePort = true;
+			}
+			catch (ArrayIndexOutOfBoundsException e){
+				System.out.print("Port not found. Enter port number and press enter: ");
+				Scanner sc = new Scanner(System.in);
+				gm.connectPlayers(NUM_PLAYERS, sc.nextInt());
+			}
+		}*/
+		
+		while (gm.run()){
+			for (int i=1; i<=NUM_PLAYERS;i++)
 				gm.turn(i);
 		}
 		gm.disconnect();
 	}
 	
-	public void connectPlayers(int numPlayers, int portIn){
+	public boolean run(){
+		return run;
+	}
+	
+	public void connectPlayers(int NUM_PLAYERS, int portIn){
 		port = portIn;
 		try {
 			serverSocket = new ServerSocket(portIn);
@@ -38,15 +60,50 @@ public class GameManager {
 			System.exit(-1);
 		}
 		try {
-			for (int i = 0; i < numPlayers; i++)
+			for (int i = 0; i < NUM_PLAYERS; i++)
 				players.add(new Player(i+1, serverSocket.accept()));
 		}
 		catch (IOException e) {
 			System.err.println("Player accept failed: " + e.getMessage());
 			System.exit(-1);
 		}
-		for (int i = 0; i < numPlayers; i++)
-			players.get(i).send(""+(i+1));
+		for (int i = 0; i < NUM_PLAYERS; i++){
+			Player player = players.get(i);
+			//read username string from client
+			//if first char is 'N'
+				//if username exists
+					//send error "err,Duplicate User Name"
+				//else
+					//store username
+					//send "ack"
+					//read password string from client
+					//store password
+					//send "ack"
+			//else if first char is 'R'
+				//if username exists
+					//send "ack"
+					//read password string from client
+					//if password matches
+						//send ack
+					//else
+						//send "err,Invalid Password"
+				//else
+					//send error "err,Unknown User"
+			player.send(""+(i+1));
+		}
+	}
+	
+	public boolean userExists(String usernameIn){
+		while (USERS.hasNext()){
+			String line = USERS.readLine();
+			int length = usernameIn.length();
+			if (line.substring(0, length).equals(usernameIn)){
+				USERS.resetReader();
+				return true;
+			}else
+				line = USERS.readLine();
+		}
+		return false;
 	}
 	
 	public void turn(int p){
@@ -100,7 +157,7 @@ public class GameManager {
 						}
 					}
 					player.send("ack");
-					for (int i=0; i<numPlayers; i++){//send other players roll info
+					for (int i=0; i<NUM_PLAYERS; i++){//send other players roll info
 						if (players.get(i) != player) 
 							players.get(i).send(split);
 					}
@@ -122,7 +179,7 @@ public class GameManager {
 				//printFinal(player);Debug
 				if (hasWon(player)){
 					player.addWin();
-					for (int i=0; i<numPlayers; i++)
+					for (int i=0; i<NUM_PLAYERS; i++)
 						players.get(i).send("P" + player.getPlayerNum()+ " has Won");
 					/*if (playAgain()){ 	
 						board = new Board();
@@ -153,7 +210,7 @@ public class GameManager {
 		}
 	}
 	
-	public boolean playAgain(){
+	/*public boolean playAgain(){
 		for (int i =0;i< players.size();i++)
 			players.get(i).send("Play Again? Y/N");
 		ArrayList<Player> newPlayers = new ArrayList<Player>();
@@ -172,7 +229,7 @@ public class GameManager {
 		}
 		return ret;
 			
-	}
+	}*/
 	
 	public void setFinal(Player p){
 		ArrayList<GamePiece> tempPieces = board.getTempPieces(p);
@@ -266,7 +323,7 @@ public class GameManager {
 	}
 	
 	public void disconnect(){
-		for(int i=0;i<numPlayers;i++){
+		for(int i=0;i<NUM_PLAYERS;i++){
 			players.get(i).send("closing connection: ");
 			players.get(i).closeConnection();
 		}
