@@ -32,6 +32,12 @@ public class Connection{
 			return reader.readLine();
 		} catch (IOException e){
 			System.err.println("Unable to read from client: " + e.getMessage());
+			try {
+				socket.close();
+			}
+			catch (IOException d){
+				System.out.println(e.getMessage());
+			}
 			return "";
 		}
 	}

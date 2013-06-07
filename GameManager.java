@@ -26,12 +26,11 @@ public class GameManager {
 		//gm.connectPlayers(NUM_PLAYERS, Integer.parseInt(args[0])); //JOSH: What happens if you can't parse the port?
 		
 		//potential fix...
-		/*boolean havePort = false;
-		int portIn;
+		boolean havePort = false;
+		int portIn = 0;
 		while (!havePort){
 			try {
 				portIn = Integer.parseInt(args[0]);
-				gm.connectPlayers(NUM_PLAYERS, portIn);
 				havePort = true;
 			}
 			catch (ArrayIndexOutOfBoundsException e){
@@ -41,7 +40,8 @@ public class GameManager {
 				sc.nextInt();
 				havePort = true;
 			}
-		}*/
+		}
+		gm.connectPlayers(NUM_PLAYERS, portIn);
 		
 		
 		while (gm.run()){
@@ -57,7 +57,6 @@ public class GameManager {
 	
 	public void connectPlayers(int NUM_PLAYERS, int portIn){
 		port = portIn;
-		System.out.println(portIn);
 		try {
 			serverSocket = new ServerSocket(portIn);
 		} 
@@ -65,15 +64,14 @@ public class GameManager {
 			System.err.println("Could not listen on port: " + portIn + ".\n" + e.getMessage());
 			System.exit(-1);
 		}
-		try {
-			for (int i = 0; i < NUM_PLAYERS; i++)
-				players.add(new Player(i+1, serverSocket.accept()));
-		}
-		catch (IOException e) {
-			System.err.println("Player accept failed: " + e.getMessage());
-			System.exit(-1);
-		}
+		
 		for (int i = 0; i < NUM_PLAYERS; i++){
+			try {
+					players.add(new Player(i+1, serverSocket.accept()));
+			}
+			catch (IOException e) {
+				System.err.println("Player accept failed: " + e.getMessage());
+			}
 			Player player = players.get(i);
 			String userMessage = player.getConnection().read();//read username string from client
 			String username = userMessage.substring(2);
