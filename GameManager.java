@@ -77,37 +77,44 @@ public class GameManager {
 		while (numConnected < NUM_PLAYERS){
 			try {
 				players.add(new Player(numConnected+1, serverSocket.accept()));
-				Player player = players.get(numConnected);
-			
-				String userMessage = player.getConnection().read();//read user name string from client
-				String username = userMessage.substring(2);
+				boolean connected = false;
+				//while the player has not connected
+				while (!connected){
+					Player player = players.get(numConnected);
 				
-				//If client is a new user
-				if (userMessage.charAt(0)== 'N'){
-					if (userMap.containsKey(username)){//if user name already exists send error
-						player.send("err,Duplicate User Name");
-					}else{
-						player.send("ack");
-						String password = player.getConnection().read();
-						userMap.put(username,new PlayerInfo(password));//add user info to map
-						player.send("ack");
-						USER_INFO.writeObject(userMap);//write map to file.
-						numConnected++;
-					}
-				}
-				//If client is a returning user
-				else if (userMessage.charAt(0)== 'R'){
-					if (userMap.containsKey(username)){//if username exists
-						player.send("ack");
-						String password = player.getConnection().read();//read password string from client
-						if (userMap.get(username).getPassword().equals(password)){//if password matches
+					String userMessage = player.getConnection().read();//read user name string from client
+					String username = userMessage.substring(2);
+					
+					//If client is a new user
+					if (userMessage.charAt(0)== 'N'){
+						if (userMap.containsKey(username)){//if user name already exists send error
+							player.send("err,Duplicate User Name");
+						}else{
 							player.send("ack");
+							String password = player.getConnection().read();
+							userMap.put(username,new PlayerInfo(password));//add user info to map
+							player.send("ack");
+							USER_INFO.writeObject(userMap);//write map to file.
+							//USER_INFO.flush();
+							connected = true;
 							numConnected++;
 						}
-						else
-							player.send("err,Invalid Password");//password doesn't match
-					}else
-						player.send("err,Unknown User");//user not found
+					}
+					//If client is a returning user
+					else if (userMessage.charAt(0)== 'R'){
+						if (userMap.containsKey(username)){//if username exists
+							player.send("ack");
+							String password = player.getConnection().read();//read password string from client
+							if (userMap.get(username).getPassword().equals(password)){//if password matches
+								player.send("ack");
+								connected = true;
+								numConnected++;
+							}
+							else
+								player.send("err,Invalid Password");//password doesn't match
+						}else
+							player.send("err,Unknown User");//user not found
+					}
 				}
 			}
 			catch (IOException e) {

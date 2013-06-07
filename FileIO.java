@@ -13,19 +13,30 @@ public class FileIO {
 	public FileIO(String fileNameIn){
 		FILE_NAME = fileNameIn;
 		try{
-			fOutStream = new FileOutputStream(new File(FILE_NAME));//check whether this overwrites data or appends.
-			objectOut = new ObjectOutputStream(fOutStream);
-			Map<String,PlayerInfo> map = new HashMap<String,PlayerInfo>();
-			map.put("john", new PlayerInfo("password"));
-			
-			objectOut.writeObject(map);
-			
 			fInputStream = new FileInputStream(new File(FILE_NAME));
 			objectIn = new ObjectInputStream(fInputStream);
 		}
 		catch (IOException e){
-			System.err.println("Error creating Object reader or writer: " +e.getMessage());
+			//If .dat file is empty -- initialize it here
+			System.out.println(e.getMessage());
+			initFile();
+			try{
+				fInputStream = new FileInputStream(new File(FILE_NAME));
+				objectIn = new ObjectInputStream(fInputStream);
+			}
+			catch (FileNotFoundException f){
+				System.out.println(f.getMessage());
+			}
+			catch (IOException g){
+				System.out.println(g.getMessage());
+			}
 		}
+	}
+	
+	public void initFile(){
+		Map<String,PlayerInfo> map = new HashMap<String,PlayerInfo>();
+		map.put("guest", new PlayerInfo("guest"));
+		writeObject(map);
 	}
 	
 	public Object read(){
@@ -55,6 +66,8 @@ public class FileIO {
 	
 	public void writeObject(Object input){
 		try {
+			fOutStream = new FileOutputStream(new File(FILE_NAME), false);//check whether this overwrites data or appends.
+			objectOut = new ObjectOutputStream(fOutStream);
 			objectOut.writeObject(input);
 		}
 		catch(IOException e){
@@ -71,6 +84,9 @@ public class FileIO {
 		}
 		catch(IOException e){
 			System.out.println("Error closing FileIO: "+e.getMessage());
+		}
+		catch(NullPointerException e){
+			System.out.println("Attempted to close uninitialized Output stream: "+e.getMessage());
 		}
 	}
 }
