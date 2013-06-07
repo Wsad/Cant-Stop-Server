@@ -4,6 +4,7 @@
 
 //import java.io.*;
 import java.net.*;
+import java.io.*;
 
 public class Player{
 	/** The player number which is assigned base on connection order.*/
@@ -46,7 +47,7 @@ public class Player{
 	 * the string "crap" which indicates the player cannot make a move.
 	 * @return String of two numbers delimited by a comma or "crap" 
 	 */
-	public String readSplitChoice(){
+	public String readSplitChoice() throws IOException{
 		return connection.read();
 	}
 	
@@ -55,7 +56,7 @@ public class Player{
 	 * The method will return a Boolean, true if the player wants to roll again and false if the player wants to stop.
 	 * @return True if received "roll" and False is received "stop"
 	 */
-	public boolean readTurnChoice(){
+	public boolean readTurnChoice() throws IOException{
 		if (connection.read().equals("roll"))
 			return true;
 		else if (connection.read().equals("stop"))

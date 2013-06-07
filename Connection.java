@@ -27,19 +27,8 @@ public class Connection{
 	
 	/** This method will read the next line sent from the client. 
 	@return The method will return a String containing a line of input from the client */
-	public String read(){
-		try {
+	public String read() throws IOException{
 			return reader.readLine();
-		} catch (IOException e){
-			System.err.println("Unable to read from client: " + e.getMessage());
-			try {
-				socket.close();
-			}
-			catch (IOException d){
-				System.out.println(e.getMessage());
-			}
-			return "";
-		}
 	}
 	
 	/** This method will print the String 'out' to the output stream. This will send information from the server to the client. 

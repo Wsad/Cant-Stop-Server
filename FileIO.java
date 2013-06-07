@@ -1,60 +1,73 @@
 import java.io.*;
-import java.util.Scanner;
+import java.util.HashMap;
+import java.util.Map;
 
 public class FileIO {
 	private final String FILE_NAME;
-	
-	private Scanner SCAN;
 
-	private FileWriter fw;
-	private BufferedWriter bw;
-	private PrintWriter writer;
+	private FileOutputStream fOutStream;
+	private ObjectOutputStream objectOut;
+	private FileInputStream fInputStream;
+	private ObjectInputStream objectIn;
 	
-	
-	//file will be organized "username;password;score;\n"
 	public FileIO(String fileNameIn){
 		FILE_NAME = fileNameIn;
 		try{
-			SCAN = new Scanner(new File(FILE_NAME));
-			fw = new FileWriter(FILE_NAME, true);
-			bw = new BufferedWriter(fw);
-			writer = new PrintWriter(bw);
+			fOutStream = new FileOutputStream(new File(FILE_NAME));//check whether this overwrites data or appends.
+			objectOut = new ObjectOutputStream(fOutStream);
+			Map<String,PlayerInfo> map = new HashMap<String,PlayerInfo>();
+			map.put("john", new PlayerInfo("password"));
+			
+			objectOut.writeObject(map);
+			
+			fInputStream = new FileInputStream(new File(FILE_NAME));
+			objectIn = new ObjectInputStream(fInputStream);
 		}
 		catch (IOException e){
-			System.err.println("Error creating file IO: " +e.getMessage());
+			System.err.println("Error creating Object reader or writer: " +e.getMessage());
 		}
 	}
 	
-	public String readLine(){
-		String ret = "";
-		if (SCAN.hasNext())
-			ret = SCAN.nextLine();
-		return ret;
+	public Object read(){
+		try {
+			return objectIn.readObject();
+		}
+		catch(IOException e){
+			System.out.println("Error reading object from file " + e.getMessage());
+		}
+		catch(ClassNotFoundException e){
+			System.out.println("Error reading object from file " + e.getMessage());
+		}
+		return null;
+		
+
 	}
 	
 	public void resetReader(){
 		try{
-			SCAN = new Scanner(new File(FILE_NAME));
+			objectIn = new ObjectInputStream(fInputStream);
 		}
-		catch (FileNotFoundException e){
-			System.out.println(e.getMessage());
+		catch(IOException e){
+			System.out.println("Unable to reset object reader: "+ e.getMessage());
 		}
 	}
 	
 	
-	public void println(String input){
-		writer.println(input);
-	}
-	
-	public boolean hasNext(){
-		return SCAN.hasNextLine();
+	public void writeObject(Object input){
+		try {
+			objectOut.writeObject(input);
+		}
+		catch(IOException e){
+			System.out.println("Unable to write object to file: "+ e.getMessage());
+		}
 	}
 	
 	public void close(){
 		try{			
-			writer.close();
-			bw.close();
-			fw.close();
+			objectOut.close();
+			fOutStream.close();
+			objectIn.close();
+			fInputStream.close();
 		}
 		catch(IOException e){
 			System.out.println("Error closing FileIO: "+e.getMessage());
