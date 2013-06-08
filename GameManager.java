@@ -1,3 +1,5 @@
+/**@author Alex Ringeri	GameManager Class to run the game */
+
 import java.io.*;
 import java.net.*;
 //import java.util.AbstractMap;
@@ -17,6 +19,8 @@ public class GameManager {
 	private final FileIO USER_INFO;
 	private final String USER_FILE = "userInfo.dat";
 	
+	/** Constructor GameManger holds player, board, serversocket, userinfo and run
+	 * 				@param void */
 	public GameManager(){
 		players = new ArrayList<Player>();
 		board = new Board();
@@ -26,6 +30,8 @@ public class GameManager {
 		serverRun = true;
 	}
 	
+	/** Main Method runs the server and all game logic
+	 * @throws ArrayIndexOutOfBoundsException -if port is not found */ 
 	public static void main(String[] args){
 		GameManager gm = new GameManager();
 		//gm.connectPlayers(NUM_PLAYERS, Integer.parseInt(args[0])); //JOSH: What happens if you can't parse the port?
@@ -54,14 +60,30 @@ public class GameManager {
 		}
 	}
 	
+	/**Method runGame to retrive run variable
+	 * @param void
+	 * @return boolean run */
 	public boolean runGame(){
 		return run;
 	}
 	
+	/**Method setGame to set the run variable
+	 * @param boolean value -set the value of the run boolean
+	 * @return void */
 	public void setRun(boolean value){
 		run = value;
 	}
 	
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+	/**Method connectPlayers to connect the players to the server
+	 * @param int NUM_PLAYERS -represents the number of players
+	 * @param int portIn      -represents the port number
+	 * @throws IOException    -if the port number is incorrect
+	 * @throws IOException 	  -if the player connection fails */
+=======
+>>>>>>> refs/heads/testHead
 	public boolean serverRun(){
 		return serverRun;
 	}
@@ -70,6 +92,10 @@ public class GameManager {
 		serverRun = value;
 	}
 	
+<<<<<<< HEAD
+=======
+>>>>>>> Added looping for connecting to users and game
+>>>>>>> refs/heads/testHead
 	public void connectPlayers(int NUM_PLAYERS, int portIn){
 		port = portIn;
 		try {
@@ -143,6 +169,10 @@ public class GameManager {
 		}
 	}
 	
+	/**Method turn allows players to roll, detects valid moves, runs the game logic
+	 * @param int p 		-represents the player number
+	 * @return void
+	 * @throws IOException	-when one player disconnects */
 	public void turn(int p){
 		boolean turn = true;
 		Player player = players.get(p-1);
@@ -244,6 +274,9 @@ public class GameManager {
 		}		
 	}
 	
+	/**Method printFinal to print the column number and height of the final pieces of a specific player
+	 * @param Player p 		-Player object
+	 * @return void */
 	public void printFinal(Player p){
 		Column[] col = board.getColArr();
 		for (int i=0;i<col.length;i++){
@@ -257,12 +290,18 @@ public class GameManager {
 		}
 	}
 	
+	/**Method setFinal to set temp pieces to final for a player
+	 * @param Player p 		-Player object
+	 * @return void */
 	public void setFinal(Player p){
 		ArrayList<GamePiece> tempPieces = board.getTempPieces(p);
 		for (int i = 0; i < tempPieces.size(); i++)
 			tempPieces.get(i).setFinal(true);
 	}
 	
+	/**Method hasWon checks if the player has won
+	 * @param Player p 		-Player object
+	 * @return boolean */
 	public boolean hasWon(Player p){
 		Column [] col = board.getColArr();
 		int conquered = 0;
@@ -271,20 +310,18 @@ public class GameManager {
 			if ((finalPiece) != null && (finalPiece.getHeight() == col[i].getHeight()))
 				conquered++;
 		}
-		/*System.out.println("Has Won Method");
-		ArrayList<Column> conqueredList = board.getConqueredCols();
 		
-		for (int i =0; i < conqueredList.size() ; i++){
-			System.out.println("\nConquered Column " + i+"\n # " +conqueredList.get(i).getNum());
-			if(conqueredList.get(i).getTopPiece().getPlayer() == p.getPlayerNum())
-				conquered++;
-		}*/
 		if (conquered >= 3)
 			return true;
 		else
 			return false;
 	}
 	
+	/**Method canMove to check if the player can move a GamePiece
+	 * @param Player p 				-Player object
+	 * @param String rollIn  		-the roll of the player
+	 * @param int numberTempPieces  -number of temp pieces of the player
+	 * @return boolean */
 	public boolean canMove(Player p, String rollIn, int numberTempPieces){
 		Scanner rollScan = new Scanner(rollIn).useDelimiter(",");
 		int d1 = rollScan.nextInt();
@@ -314,6 +351,10 @@ public class GameManager {
 		//								else return false (crapped out)
 	}
 	
+	/**Method setPiece to set a GamePiece object to a column for a specific player
+	 * @param Player p 		-Player object
+	 * @param int col 		-column number 
+	 * @return boolean		 */
 	public boolean setPiece(int player, int col){
 		Column column = board.getColumn(col);
 		GamePiece gamePiece = column.getFinalPiece(player);
@@ -329,6 +370,10 @@ public class GameManager {
 			return false;
 	}
 
+	/**Method advPiece to advance a GamePiece up acolumn for a specific player
+	 * @param Player p 		-Player object
+	 * @param int col 		-column number 
+	 * @return boolean		 */
 	public boolean advPiece(int player, int col){
 		Column column = board.getColumn(col);
 		GamePiece gamePiece = column.getTempPiece(player);
@@ -348,6 +393,9 @@ public class GameManager {
 		return false;
 	}
 	
+	/**Method disconnect closes the connection between players
+	 * @param void
+	 * @return void		 */
 	public void disconnect(){
 		for(int i=0;i<NUM_PLAYERS;i++){
 			players.get(i).send("closing connection: ");
@@ -355,10 +403,17 @@ public class GameManager {
 		}
 	}
 	
+	/**Method setPort the port variable
+	 * @param int portIn 	-represents port number
+	 * @return void		 */
 	public void setPort(int portIn){
 		port = portIn;
 	}
 	
+	/**Method validSplit check if the split is valid, also handles crapping out
+	 * @param String diceSplitIn 	-the split options for the player
+	 * @param String splitIn		-the option the player chooses
+	 * @return void		 */
 	public boolean validSplit(String diceSplitIn, String splitIn){
 		return ((diceSplitIn.contains(splitIn))||(splitIn.contains("crap")));
 	}

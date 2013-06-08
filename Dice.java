@@ -7,7 +7,7 @@ public class Dice {
 	private static int d1,d2,d3,d4;
 	private static Random dice1=new Random();
 	
-	//** Method: Roll @param: void @return String containing 4 dice integers delimited by a comma*/
+	/** Method: Roll @param: void @return String containing 4 dice integers delimited 	*   by a comma */
 	public static String roll(){
 		d1 = dice1.nextInt(6)+1;
 		d2 = dice1.nextInt(6)+1;
@@ -19,7 +19,7 @@ public class Dice {
 	}
 	
 	
-		//**Method: Split Adds all the possibilities for a dice to be split @param: void @return: void*/
+		/** Method: Split Adds all the possibilities for a dice to be split 			*   @param: void @return: void */
 	public static String split(){
 			
 		int split1 = d1 + d4; 
@@ -37,7 +37,9 @@ public class Dice {
 		
 	}
 		
-		//** Method getDice @param: Void @return: String containing dice integers 
+	/** Method getDice to retrieve the Dice object that holds 4 dice integers
+	*	@param: Void 
+	*	@return: String text	-representing four dice integers */
 	public String getDice(){
 			String text = " " + d1 + " " + d2 + " " + d3 + " " + d4;  
 			return text;
