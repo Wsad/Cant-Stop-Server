@@ -74,28 +74,11 @@ public class GameManager {
 		run = value;
 	}
 	
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
 	/**Method connectPlayers to connect the players to the server
 	 * @param int NUM_PLAYERS -represents the number of players
 	 * @param int portIn      -represents the port number
 	 * @throws IOException    -if the port number is incorrect
 	 * @throws IOException 	  -if the player connection fails */
-=======
->>>>>>> refs/heads/testHead
-	public boolean serverRun(){
-		return serverRun;
-	}
-	
-	public void setServerRun(boolean value){
-		serverRun = value;
-	}
-	
-<<<<<<< HEAD
-=======
->>>>>>> Added looping for connecting to users and game
->>>>>>> refs/heads/testHead
 	public void connectPlayers(int NUM_PLAYERS, int portIn){
 		port = portIn;
 		try {
