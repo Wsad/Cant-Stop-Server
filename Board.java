@@ -1,5 +1,5 @@
 /** @author Alex Ringeri and Nigel Gauvin Board Class to contain Column objects and Manage 
- * GamePiece objects on the columns. 
+ * GamePiece objects on the columns. */
 
 import java.util.ArrayList;
 
