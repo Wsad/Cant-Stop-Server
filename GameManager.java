@@ -74,6 +74,20 @@ public class GameManager {
 		run = value;
 	}
 	
+	/**Method gets the server run boolean. Used for main server loop
+	 * @param boolean value -set the value of the run boolean
+	 * @return void */
+	public boolean serverRun(){
+		return serverRun;
+	}
+	
+	/**Method sets the server run value
+	 * @param boolean value -set the value of the run boolean
+	 * @return void */
+	public void setServerRun(boolean value){
+		serverRun = value;
+	}
+	
 	/**Method connectPlayers to connect the players to the server
 	 * @param int NUM_PLAYERS -represents the number of players
 	 * @param int portIn      -represents the port number
