@@ -86,7 +86,7 @@ public class FileIO {
 			System.out.println("Error closing FileIO: "+e.getMessage());
 		}
 		catch(NullPointerException e){
-			System.out.println("Attempted to close uninitialized Output stream: "+e.getMessage());
+			//System.out.println("Attempted to close uninitialized Output stream: "+e.getMessage());
 		}
 	}
 }

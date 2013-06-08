@@ -10,6 +10,7 @@ public class GameManager {
 	private ArrayList<Player> players;
 	private Board board;
 	private boolean run;
+	private boolean serverRun;
 	private int port;
 	private static final int NUM_PLAYERS = 2;//2;
 	private ServerSocket serverSocket;
@@ -22,6 +23,7 @@ public class GameManager {
 		serverSocket = null;
 		USER_INFO = new FileIO(USER_FILE);
 		run = true;
+		serverRun = true;
 	}
 	
 	public static void main(String[] args){
@@ -42,12 +44,14 @@ public class GameManager {
 				havePort = true;
 			}
 		}
-		gm.connectPlayers(NUM_PLAYERS, portIn);
-		while (gm.runGame()){
-			for (int i=1; i<=NUM_PLAYERS;i++)
-				gm.turn(i);		
+		while (gm.serverRun()){
+			gm.connectPlayers(NUM_PLAYERS, portIn);
+			while (gm.runGame()){
+				for (int i=1; i<=NUM_PLAYERS;i++)
+					gm.turn(i);		
+			}
+			gm.disconnect();
 		}
-		gm.disconnect();
 	}
 	
 	public boolean runGame(){
@@ -56,6 +60,14 @@ public class GameManager {
 	
 	public void setRun(boolean value){
 		run = value;
+	}
+	
+	public boolean serverRun(){
+		return serverRun;
+	}
+	
+	public void setServerRun(boolean value){
+		serverRun = value;
 	}
 	
 	public void connectPlayers(int NUM_PLAYERS, int portIn){
@@ -125,6 +137,10 @@ public class GameManager {
 			
 		}
 		USER_INFO.close();
+		
+		for (int i = 0; i < NUM_PLAYERS; i++){
+			players.get(i).send(""+(i+1));
+		}
 	}
 	
 	public void turn(int p){
