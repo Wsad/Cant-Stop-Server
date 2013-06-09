@@ -1,3 +1,5 @@
+/**@author Alex Ringeri File IO to read to and from a textfile storing the player information (username, password, wins, losses, points) */
+
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
@@ -10,6 +12,12 @@ public class FileIO {
 	private FileInputStream fInputStream;
 	private ObjectInputStream objectIn;
 	
+	/**Constructor FileIO 
+	 * @param String fileNameIn 		-name of the file
+	 * @return void					
+	 * @throws IOException 				-if the file is empty
+	 * @throws FileNotFoundException 	-if the file cannot be found
+	 * @throws IOException				-if it cannot write to the file */
 	public FileIO(String fileNameIn){
 		FILE_NAME = fileNameIn;
 		try{
@@ -33,12 +41,20 @@ public class FileIO {
 		}
 	}
 	
+	/** Method initFile for storing player information
+	 * @param void
+	 * @return void */
 	public void initFile(){
 		Map<String,PlayerInfo> map = new HashMap<String,PlayerInfo>();
 		map.put("guest", new PlayerInfo("guest"));
 		writeObject(map);
 	}
 	
+	/** Method read for reading from the file
+	 * @param void
+	 * @return Object null
+	 * @throws IOException				-Error reading from the file
+	 * @throws ClassNotFoundException */
 	public Object read(){
 		try {
 			return objectIn.readObject();
@@ -54,6 +70,10 @@ public class FileIO {
 
 	}
 	
+	/** Method resetReader to reset the input stream
+	 * @param void
+	 * @return void
+	 * @throws IOException	-if the reader is unable to be reset */
 	public void resetReader(){
 		try{
 			objectIn = new ObjectInputStream(fInputStream);
@@ -63,6 +83,10 @@ public class FileIO {
 		}
 	}
 	
+	/** Method writeObject for writing to the file
+	 * @param Object input 
+	 * @return void
+	 * @throws IOException 	-when the OutputStream is unable to write to the file  */
 	
 	public void writeObject(Object input){
 		try {
@@ -75,6 +99,10 @@ public class FileIO {
 		}
 	}
 	
+	/** Method close for closing the stream
+	 * @param void
+	 * @return void
+	 * @throws IOException 	-Error closing the file */
 	public void close(){
 		try{			
 			objectOut.close();
