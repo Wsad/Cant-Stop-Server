@@ -3,6 +3,8 @@
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.ArrayList;
+import java.util.Collection;
 
 public class FileIO {
 	private final String FILE_NAME;
@@ -61,6 +63,8 @@ public class FileIO {
 		}
 		catch(IOException e){
 			System.out.println("Error reading object from file " + e.getMessage());
+			initFile();
+			System.out.println("File reset");
 		}
 		catch(ClassNotFoundException e){
 			System.out.println("Error reading object from file " + e.getMessage());
@@ -99,6 +103,36 @@ public class FileIO {
 		}
 	}
 	
+	public String getTopPlayers(){
+		Map<String,PlayerInfo> map = new HashMap<String,PlayerInfo>();
+		map = (HashMap)read();
+		ArrayList<PlayerInfo> pInfo =(ArrayList<PlayerInfo>)map.values();
+		PlayerInfo max = pInfo.get(0);
+		for (int i=1; i<pInfo.size(); i++){
+			PlayerInfo p = pInfo.get(i);
+			if (p.getPoints()>max.getPoints()){
+				max = p;
+			}
+		}
+		PlayerInfo max2 = pInfo.get(0);
+		for (int i=1; i<pInfo.size(); i++){
+			PlayerInfo p = pInfo.get(i);
+			if (p.getPoints()>max2.getPoints()){
+				if (p != max)
+					max2=p;
+			}
+		}
+		PlayerInfo max3 = pInfo.get(0);
+		for (int i=1; i<pInfo.size(); i++){
+			PlayerInfo p = pInfo.get(i);
+			if (p.getPoints()>max3.getPoints()){
+				if (p != max2 && p !=max)
+					max3=p;
+			}
+		}
+		return max.toString()+","+max2.toString()+","+max3.toString();
+	}
+	
 	/** Method close for closing the stream
 	 * @param void
 	 * @return void
@@ -116,5 +150,10 @@ public class FileIO {
 		catch(NullPointerException e){
 			//System.out.println("Attempted to close uninitialized Output stream: "+e.getMessage());
 		}
+	}
+	
+	public static void main(String [] args){
+		FileIO fi = new FileIO("userInfo.dat");
+		System.out.println(fi.getTopPlayers());
 	}
 }

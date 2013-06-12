@@ -13,6 +13,8 @@ public class Player{
 	private int wins;
 	/** A Connection object which will be used to communicate between the server and client*/
 	private Connection connection;
+	/** player username */
+	private String username;
 	
 	/**
 	 * Constructor: creates a Player object
@@ -107,6 +109,14 @@ public class Player{
 			playerNum = numIn;
 		else
 			System.out.println("Invalid player number. Method: Player.setNumber");
+	}
+	
+	public void setUsername(String userIn){
+		username = userIn;
+	}
+	
+	public String getUsername(){
+		return username;
 	}
 	
 	/**

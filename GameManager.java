@@ -2,7 +2,7 @@
 
 import java.io.*;
 import java.net.*;
-//import java.util.AbstractMap;
+import java.util.NoSuchElementException;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Scanner;
@@ -46,12 +46,13 @@ public class GameManager {
 				System.out.print("Port not found. Enter port number and press enter: ");
 				Scanner sc = new Scanner(System.in);
 				portIn = sc.nextInt();
-				sc.nextInt();
 				havePort = true;
+				System.out.println(portIn);
 			}
 		}
+		gm.initSocket(portIn);
 		while (gm.serverRun()){
-			gm.connectPlayers(NUM_PLAYERS, portIn);
+			gm.connectPlayers(NUM_PLAYERS);
 			while (gm.runGame()){
 				for (int i=1; i<=NUM_PLAYERS;i++)
 					gm.turn(i);		
@@ -87,13 +88,10 @@ public class GameManager {
 	public void setServerRun(boolean value){
 		serverRun = value;
 	}
-	
-	/**Method connectPlayers to connect the players to the server
-	 * @param int NUM_PLAYERS -represents the number of players
-	 * @param int portIn      -represents the port number
-	 * @throws IOException    -if the port number is incorrect
-	 * @throws IOException 	  -if the player connection fails */
-	public void connectPlayers(int NUM_PLAYERS, int portIn){
+	/* initialized socket to accept connections on the specified port
+	 * @param portIn the specified port
+	 */
+	public void initSocket(int portIn){
 		port = portIn;
 		try {
 			serverSocket = new ServerSocket(portIn);
@@ -103,6 +101,14 @@ public class GameManager {
 			System.exit(-1);
 		}
 		
+	}
+	
+	/**Method connectPlayers to connect the players to the server
+	 * @param int NUM_PLAYERS -represents the number of players
+	 * @param int portIn      -represents the port number
+	 * @throws IOException    -if the port number is incorrect
+	 * @throws IOException 	  -if the player connection fails */
+	public void connectPlayers(int NUM_PLAYERS){
 		int numConnected = 0;
 		
 		//Retrieve map of player info from file "userInfo.dat"
@@ -111,7 +117,8 @@ public class GameManager {
 		//Keep trying to accept players until two connections are made
 		while (numConnected < NUM_PLAYERS){
 			try {
-				players.add(new Player(numConnected+1, serverSocket.accept()));
+				Player newPlayer = new Player(numConnected+1, serverSocket.accept());
+				players.add(newPlayer);
 				boolean connected = false;
 				//while the player has not connected
 				while (!connected){
@@ -130,8 +137,8 @@ public class GameManager {
 							userMap.put(username,new PlayerInfo(password));//add user info to map
 							player.send("ack");
 							USER_INFO.writeObject(userMap);//write map to file.
-							//USER_INFO.flush();
 							connected = true;
+							player.setUsername(username);
 							numConnected++;
 						}
 					}
@@ -142,6 +149,7 @@ public class GameManager {
 							String password = player.getConnection().read();//read password string from client
 							if (userMap.get(username).getPassword().equals(password)){//if password matches
 								player.send("ack");
+								player.setUsername(username);
 								connected = true;
 								numConnected++;
 							}
@@ -156,10 +164,15 @@ public class GameManager {
 				//The server loses connection to a client while they try to set up user name.
 				//Do not increment numConnected and return to top of while loop.
 				System.err.println("Player accept failed: " + e.getMessage());
+				players.remove(players.size()-1);
+			}
+			catch(NullPointerException e){
+				System.err.println("Player accept failed: " + e.getMessage());
+				players.remove(players.size()-1);
 			}
 			
 		}
-		USER_INFO.close();
+		//USER_INFO.close();
 		
 		for (int i = 0; i < NUM_PLAYERS; i++){
 			players.get(i).send(""+(i+1));
@@ -189,7 +202,7 @@ public class GameManager {
 					
 					int numTemp = board.getNumPieces(player);
 					
-					if (canMove(player, roll, numTemp)){
+					if ((canMove(player, roll, numTemp))&&(!split.equals("crap"))){
 						//if valid split and the player can move: place pieces on available columns
 						Scanner splitScan = new Scanner(split).useDelimiter(",");
 						int d1 = splitScan.nextInt();
@@ -254,6 +267,15 @@ public class GameManager {
 							if (players.get(i)!= player)
 								players.get(i).send("you lost");
 						}
+						sendFinalString(player,true);
+						
+						for (int i=0; i<NUM_PLAYERS; i++){
+							if (players.get(i)!= player){
+								sendFinalString(players.get(i),false);
+							}
+						}
+						//USER_INFO.close();
+						
 						run = false;
 					}
 					else if (p == players.size())//if active player is last in array send go to first player
@@ -267,12 +289,35 @@ public class GameManager {
 				//It will throw an IOException, and be caught here.
 				//The player still connected will win the game and the server will reset to accept connections again.
 				for (int i=0; i<NUM_PLAYERS; i++){
-					if (players.get(i)!= player)
+					if (players.get(i)!= player){
 						players.get(i).send("you won");
+						sendFinalString(players.get(i),true);
+					}
 				}
 				turn = false;
 				run = false;
 			}
+			catch (NullPointerException e){
+				for (int i=0; i<NUM_PLAYERS; i++){
+					if (players.get(i)!= player){
+						players.get(i).send("you won");
+						sendFinalString(players.get(i),true);
+					}
+				}
+				turn = false;
+				run = false;
+			}
+			catch (NoSuchElementException e){
+				for (int i=0; i<NUM_PLAYERS; i++){
+					if (players.get(i)!= player){
+						players.get(i).send("you won");
+						sendFinalString(players.get(i),true);
+					}
+				}
+				turn = false;
+				run = false;
+			}
+			
 		}		
 	}
 	
@@ -394,6 +439,27 @@ public class GameManager {
 		}
 		return false;
 	}
+	/** Will send the specified player the final string with stats.
+	 * 
+	 * @param playerIn the player to which the info will be sent.
+	 * @param hasWon Whether the specified player has won the game
+	 */
+	public void sendFinalString(Player playerIn, boolean hasWon){
+		Map<String,PlayerInfo> map = new HashMap<String,PlayerInfo>();
+		map = (HashMap)USER_INFO.read();
+		PlayerInfo pInfo = map.get(playerIn.getUsername());
+		if(hasWon)
+			pInfo.addWin();
+		else
+			pInfo.addLoss();
+		pInfo.addGame();
+		int points = pInfo.getWins()*10 - pInfo.getLosses()*10;
+		String endString = pInfo.getWins()+","+pInfo.getLosses()+","+points;
+		playerIn.send(endString);
+		playerIn.send(USER_INFO.getTopPlayers());
+		USER_INFO.writeObject(map);		
+	}
+	
 	
 	/**Method disconnect closes the connection between players
 	 * @param void

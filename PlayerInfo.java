@@ -22,5 +22,29 @@ public class PlayerInfo implements Serializable {
 	public String getPassword(){
 		return password;
 	}
-	
+	public void addWin(){
+		wins++;
+	}
+	public void addLoss(){
+		losses++;
+	}
+	public void addGame(){
+		games++;
+	}
+	public int getWins(){
+		return wins;
+	}
+	public int getLosses(){
+		return losses;
+	}
+	public int getGames(){
+		return games;
+	}
+	public int getPoints(){
+		int p = this.getWins()*10 - this.getLosses()*10;
+		return p;
+	}
+	public String toString(){
+		return username + "," + wins + "," + games + "," + getPoints();
+	}
 }
