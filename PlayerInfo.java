@@ -9,11 +9,12 @@ public class PlayerInfo implements Serializable {
 
 	/** Constructor: creates PlayerInfo object accepts the password entered and sets 	*		 wins, losses and games to 0.
 	*		 @param  passwordIn 	-represents the password player enters	*/	
-	public PlayerInfo(String passwordIn){
+	public PlayerInfo(String passwordIn, String usernameIn){
 		password = passwordIn;
 		wins = 0;
 		losses = 0;
 		games = 0;
+		username = usernameIn;
 	}
 
 	/** Method getPassword to retrieve the password 
@@ -44,6 +45,11 @@ public class PlayerInfo implements Serializable {
 		int p = this.getWins()*10 - this.getLosses()*10;
 		return p;
 	}
+	
+	public void setUsername(String userIn){
+		username = userIn;
+	}
+	
 	public String toString(){
 		return username + "," + wins + "," + games + "," + getPoints();
 	}

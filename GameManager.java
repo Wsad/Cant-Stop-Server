@@ -134,7 +134,7 @@ public class GameManager {
 						}else{
 							player.send("ack");
 							String password = player.getConnection().read();
-							userMap.put(username,new PlayerInfo(password));//add user info to map
+							userMap.put(username,new PlayerInfo(password,username));//add user info to map
 							player.send("ack");
 							USER_INFO.writeObject(userMap);//write map to file.
 							connected = true;

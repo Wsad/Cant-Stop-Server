@@ -48,7 +48,7 @@ public class FileIO {
 	 * @return void */
 	public void initFile(){
 		Map<String,PlayerInfo> map = new HashMap<String,PlayerInfo>();
-		map.put("guest", new PlayerInfo("guest"));
+		map.put("guest", new PlayerInfo("guest","guest"));
 		writeObject(map);
 	}
 	
@@ -106,25 +106,26 @@ public class FileIO {
 	public String getTopPlayers(){
 		Map<String,PlayerInfo> map = new HashMap<String,PlayerInfo>();
 		map = (HashMap)read();
-		ArrayList<PlayerInfo> pInfo =(ArrayList<PlayerInfo>)map.values();
-		PlayerInfo max = pInfo.get(0);
-		for (int i=1; i<pInfo.size(); i++){
-			PlayerInfo p = pInfo.get(i);
+		int size = map.size();
+		PlayerInfo[] pInfo = map.values().toArray(new PlayerInfo[map.size()]);
+		PlayerInfo max = pInfo[0];
+		for (int i=1; i<pInfo.length; i++){
+			PlayerInfo p = pInfo[i];
 			if (p.getPoints()>max.getPoints()){
 				max = p;
 			}
 		}
-		PlayerInfo max2 = pInfo.get(0);
-		for (int i=1; i<pInfo.size(); i++){
-			PlayerInfo p = pInfo.get(i);
+		PlayerInfo max2 = pInfo[0];
+		for (int i=1; i<pInfo.length; i++){
+			PlayerInfo p = pInfo[i];
 			if (p.getPoints()>max2.getPoints()){
 				if (p != max)
 					max2=p;
 			}
 		}
-		PlayerInfo max3 = pInfo.get(0);
-		for (int i=1; i<pInfo.size(); i++){
-			PlayerInfo p = pInfo.get(i);
+		PlayerInfo max3 = pInfo[0];
+		for (int i=1; i<pInfo.length; i++){
+			PlayerInfo p = pInfo[i];
 			if (p.getPoints()>max3.getPoints()){
 				if (p != max2 && p !=max)
 					max3=p;
